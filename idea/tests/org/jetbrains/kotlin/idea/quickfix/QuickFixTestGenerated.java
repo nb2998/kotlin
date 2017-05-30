@@ -4826,6 +4826,12 @@ public class QuickFixTestGenerated extends AbstractQuickFixTest {
             doTest(fileName);
         }
 
+        @TestMetadata("noInfixCall.kt")
+        public void testNoInfixCall() throws Exception {
+            String fileName = KotlinTestUtils.navigationMetadata("idea/testData/quickfix/deprecatedSymbolUsage/noInfixCall.kt");
+            doTest(fileName);
+        }
+
         @TestMetadata("noReplacement.kt")
         public void testNoReplacement() throws Exception {
             String fileName = KotlinTestUtils.navigationMetadata("idea/testData/quickfix/deprecatedSymbolUsage/noReplacement.kt");
