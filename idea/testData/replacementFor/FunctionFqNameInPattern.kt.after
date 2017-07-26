@@ -1,0 +1,10 @@
+// WITH_RUNTIME
+
+@ReplacementFor("kotlin.collections.listOf(this)")
+fun String.singletonList(): List<String> = listOf(this)
+
+fun foo() {
+    "a".singletonList()
+    "a".singletonList()
+    listOf(1)
+}

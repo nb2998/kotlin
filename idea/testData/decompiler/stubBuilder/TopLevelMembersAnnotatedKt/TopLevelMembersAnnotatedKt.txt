@@ -10,7 +10,7 @@ PsiJetFileStubImpl[package=a.b.c.topLevelMembersAnnotated]
   IMPORT_LIST
   PROPERTY[fqName=a.b.c.topLevelMembersAnnotated.i, hasDelegate=false, hasDelegateExpression=false, hasInitializer=false, hasReturnTypeRef=true, isExtension=false, isTopLevel=true, isVar=false, name=i]
     MODIFIER_LIST[public]
-      ANNOTATION_ENTRY[hasValueArguments=false, shortName=a]
+      ANNOTATION_ENTRY[hasValueArguments=false, replacementForPatternName=null, shortName=a]
         CONSTRUCTOR_CALLEE
           TYPE_REFERENCE
             USER_TYPE
@@ -21,7 +21,7 @@ PsiJetFileStubImpl[package=a.b.c.topLevelMembersAnnotated]
                   REFERENCE_EXPRESSION[referencedName=e]
                 REFERENCE_EXPRESSION[referencedName=f]
               REFERENCE_EXPRESSION[referencedName=a]
-      ANNOTATION_ENTRY[hasValueArguments=false, shortName=b]
+      ANNOTATION_ENTRY[hasValueArguments=false, replacementForPatternName=null, shortName=b]
         CONSTRUCTOR_CALLEE
           TYPE_REFERENCE
             USER_TYPE
@@ -39,7 +39,7 @@ PsiJetFileStubImpl[package=a.b.c.topLevelMembersAnnotated]
         REFERENCE_EXPRESSION[referencedName=Int]
   FUN[fqName=a.b.c.topLevelMembersAnnotated.f, hasBlockBody=true, hasBody=true, hasTypeParameterListBeforeFunctionName=false, isExtension=false, isTopLevel=true, name=f]
     MODIFIER_LIST[public]
-      ANNOTATION_ENTRY[hasValueArguments=false, shortName=a]
+      ANNOTATION_ENTRY[hasValueArguments=false, replacementForPatternName=null, shortName=a]
         CONSTRUCTOR_CALLEE
           TYPE_REFERENCE
             USER_TYPE
@@ -50,7 +50,7 @@ PsiJetFileStubImpl[package=a.b.c.topLevelMembersAnnotated]
                   REFERENCE_EXPRESSION[referencedName=e]
                 REFERENCE_EXPRESSION[referencedName=f]
               REFERENCE_EXPRESSION[referencedName=a]
-      ANNOTATION_ENTRY[hasValueArguments=false, shortName=b]
+      ANNOTATION_ENTRY[hasValueArguments=false, replacementForPatternName=null, shortName=b]
         CONSTRUCTOR_CALLEE
           TYPE_REFERENCE
             USER_TYPE
@@ -64,7 +64,7 @@ PsiJetFileStubImpl[package=a.b.c.topLevelMembersAnnotated]
     VALUE_PARAMETER_LIST
       VALUE_PARAMETER[fqName=null, hasDefaultValue=false, hasValOrVar=false, isMutable=false, name=p1]
         MODIFIER_LIST[]
-          ANNOTATION_ENTRY[hasValueArguments=false, shortName=a]
+          ANNOTATION_ENTRY[hasValueArguments=false, replacementForPatternName=null, shortName=a]
             CONSTRUCTOR_CALLEE
               TYPE_REFERENCE
                 USER_TYPE
@@ -75,7 +75,7 @@ PsiJetFileStubImpl[package=a.b.c.topLevelMembersAnnotated]
                       REFERENCE_EXPRESSION[referencedName=e]
                     REFERENCE_EXPRESSION[referencedName=f]
                   REFERENCE_EXPRESSION[referencedName=a]
-          ANNOTATION_ENTRY[hasValueArguments=false, shortName=b]
+          ANNOTATION_ENTRY[hasValueArguments=false, replacementForPatternName=null, shortName=b]
             CONSTRUCTOR_CALLEE
               TYPE_REFERENCE
                 USER_TYPE

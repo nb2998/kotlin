@@ -162,7 +162,7 @@ PsiJetFileStubImpl[package=test]
                         REFERENCE_EXPRESSION[referencedName=Int]
                 TYPE_REFERENCE
                   MODIFIER_LIST[]
-                    ANNOTATION_ENTRY[hasValueArguments=false, shortName=A]
+                    ANNOTATION_ENTRY[hasValueArguments=false, replacementForPatternName=null, shortName=A]
                       CONSTRUCTOR_CALLEE
                         TYPE_REFERENCE
                           USER_TYPE

@@ -49,7 +49,7 @@ PsiJetFileStubImpl[package=a.b.c.test.enum]
         CLASS_BODY
           PROPERTY[fqName=a.b.c.test.enum.Enum.Companion.c, hasDelegate=false, hasDelegateExpression=false, hasInitializer=false, hasReturnTypeRef=true, isExtension=false, isTopLevel=false, isVar=false, name=c]
             MODIFIER_LIST[public final]
-              ANNOTATION_ENTRY[hasValueArguments=false, shortName=Ann]
+              ANNOTATION_ENTRY[hasValueArguments=false, replacementForPatternName=null, shortName=Ann]
                 CONSTRUCTOR_CALLEE
                   TYPE_REFERENCE
                     USER_TYPE

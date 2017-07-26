@@ -69,7 +69,7 @@ PsiJetFileStubImpl[package=test]
             REFERENCE_EXPRESSION[referencedName=Unit]
       TYPEALIAS[fqName=test.TypeAliases.B, isTopLevel=false, name=B]
         MODIFIER_LIST[public]
-          ANNOTATION_ENTRY[hasValueArguments=false, shortName=Suppress]
+          ANNOTATION_ENTRY[hasValueArguments=false, replacementForPatternName=null, shortName=Suppress]
             CONSTRUCTOR_CALLEE
               TYPE_REFERENCE
                 USER_TYPE
@@ -92,14 +92,14 @@ PsiJetFileStubImpl[package=test]
                 REFERENCE_EXPRESSION[referencedName=Unit]
       TYPEALIAS[fqName=test.TypeAliases.Parametrized, isTopLevel=false, name=Parametrized]
         MODIFIER_LIST[private]
-          ANNOTATION_ENTRY[hasValueArguments=false, shortName=Ann]
+          ANNOTATION_ENTRY[hasValueArguments=false, replacementForPatternName=null, shortName=Ann]
             CONSTRUCTOR_CALLEE
               TYPE_REFERENCE
                 USER_TYPE
                   USER_TYPE
                     REFERENCE_EXPRESSION[referencedName=test]
                   REFERENCE_EXPRESSION[referencedName=Ann]
-          ANNOTATION_ENTRY[hasValueArguments=false, shortName=Suppress]
+          ANNOTATION_ENTRY[hasValueArguments=false, replacementForPatternName=null, shortName=Suppress]
             CONSTRUCTOR_CALLEE
               TYPE_REFERENCE
                 USER_TYPE

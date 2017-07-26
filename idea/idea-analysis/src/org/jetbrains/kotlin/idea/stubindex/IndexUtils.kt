@@ -19,7 +19,10 @@ package org.jetbrains.kotlin.idea.stubindex
 import com.intellij.psi.stubs.IndexSink
 import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.psi.*
-import org.jetbrains.kotlin.psi.stubs.*
+import org.jetbrains.kotlin.psi.stubs.KotlinCallableStubBase
+import org.jetbrains.kotlin.psi.stubs.KotlinModifierListStub
+import org.jetbrains.kotlin.psi.stubs.KotlinStubWithFqName
+import org.jetbrains.kotlin.psi.stubs.KotlinTypeAliasStub
 import org.jetbrains.kotlin.psi.stubs.elements.KtStubElementTypes
 import org.jetbrains.kotlin.util.aliasImportMap
 
@@ -105,3 +108,9 @@ fun indexInternals(stub: KotlinCallableStubBase<*>, sink: IndexSink) {
 
 private val KotlinStubWithFqName<*>.modifierList: KotlinModifierListStub?
     get() = findChildStubByType(KtStubElementTypes.MODIFIER_LIST) as? KotlinModifierListStub
+
+internal fun KtNamedFunction.extractReplacementForPatternNames(): Collection<String> {
+    return annotationEntries
+            .mapNotNull { it.stub!!.replacementForPatternName }
+            .distinct()
+}

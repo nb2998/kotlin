@@ -15,7 +15,7 @@ PsiJetFileStubImpl[package=]
               REFERENCE_EXPRESSION[referencedName=String]
   CLASS[fqName=Annotated, isEnumEntry=false, isInterface=false, isLocal=false, isTopLevel=true, name=Annotated, superNames=[]]
     MODIFIER_LIST[]
-      ANNOTATION_ENTRY[hasValueArguments=true, shortName=Test]
+      ANNOTATION_ENTRY[hasValueArguments=true, replacementForPatternName=null, shortName=Test]
         CONSTRUCTOR_CALLEE
           TYPE_REFERENCE
             USER_TYPE

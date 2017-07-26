@@ -11,7 +11,7 @@ PsiJetFileStubImpl[package=]
   PROPERTY[fqName=foo_a, hasDelegate=false, hasDelegateExpression=false, hasInitializer=false, hasReturnTypeRef=true, isExtension=false, isTopLevel=true, isVar=false, name=foo_a]
     TYPE_REFERENCE
       MODIFIER_LIST[]
-        ANNOTATION_ENTRY[hasValueArguments=false, shortName=A]
+        ANNOTATION_ENTRY[hasValueArguments=false, replacementForPatternName=null, shortName=A]
           CONSTRUCTOR_CALLEE
             TYPE_REFERENCE
               USER_TYPE
@@ -20,7 +20,7 @@ PsiJetFileStubImpl[package=]
   PROPERTY[fqName=foo_nullable_a, hasDelegate=false, hasDelegateExpression=false, hasInitializer=false, hasReturnTypeRef=true, isExtension=false, isTopLevel=true, isVar=false, name=foo_nullable_a]
     TYPE_REFERENCE
       MODIFIER_LIST[]
-        ANNOTATION_ENTRY[hasValueArguments=false, shortName=A]
+        ANNOTATION_ENTRY[hasValueArguments=false, replacementForPatternName=null, shortName=A]
           CONSTRUCTOR_CALLEE
             TYPE_REFERENCE
               USER_TYPE
@@ -29,7 +29,7 @@ PsiJetFileStubImpl[package=]
         DYNAMIC_TYPE
   CLASS[fqName=A, isEnumEntry=false, isInterface=false, isLocal=false, isTopLevel=true, name=A, superNames=[]]
     MODIFIER_LIST[annotation]
-      ANNOTATION_ENTRY[hasValueArguments=true, shortName=Target]
+      ANNOTATION_ENTRY[hasValueArguments=true, replacementForPatternName=null, shortName=Target]
         CONSTRUCTOR_CALLEE
           TYPE_REFERENCE
             USER_TYPE

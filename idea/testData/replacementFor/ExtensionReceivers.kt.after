@@ -1,0 +1,33 @@
+// WITH_RUNTIME
+package x
+
+class A
+class B
+
+fun A.oldWay(b: B){}
+
+val A.oldProperty: Int
+    get() = 0
+
+@ReplacementFor("a.oldWay(this)")
+fun B.betterWay(a: A){}
+
+@ReplacementFor("a.oldProperty")
+fun betterWay(a: A) = 0
+
+fun A.foo(a: A, b: B) {
+    b.betterWay(a)
+    b.betterWay(this)
+
+    print(betterWay(a))
+    print(betterWay(this))
+}
+
+fun B.foo(a: A, b: B) {
+    betterWay(a)
+
+    with(a) {
+        betterWay(this)
+        print(x.betterWay(this))
+    }
+}

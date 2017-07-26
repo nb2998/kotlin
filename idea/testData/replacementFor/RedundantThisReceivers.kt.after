@@ -1,0 +1,27 @@
+// WITH_RUNTIME
+class A
+class B
+
+fun A.foo1(b: B){}
+fun A.foo2(b: B){}
+
+@ReplacementFor("a.foo1(this)")
+fun B.bar1(a: A){}
+
+@ReplacementFor("a.foo2(this)")
+fun B.bar2(a: A){}
+
+
+fun B.f(a: A, b: B) {
+    bar1(a)
+
+    fun bar2(a: A) {
+    }
+
+    this.bar2(a)
+
+    with(b) {
+        this@f.bar1(a)
+        bar1(a)
+    }
+}

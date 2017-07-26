@@ -1,0 +1,17 @@
+// WITH_RUNTIME
+import javax.swing.SwingUtilities
+
+@ReplacementFor("javax.swing.SwingUtilities.invokeLater(this)")
+fun Runnable.invokeItLater() {
+    SwingUtilities.invokeLater(this)
+}
+
+fun foo() {
+    Runnable {
+        print(1)
+    }.invokeItLater()
+
+    Runnable {
+        print(1)
+    }.invokeItLater()
+}

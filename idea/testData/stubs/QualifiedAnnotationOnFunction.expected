@@ -3,7 +3,7 @@ PsiJetFileStubImpl[package=]
   IMPORT_LIST
   FUN[fqName=foo, hasBlockBody=true, hasBody=true, hasTypeParameterListBeforeFunctionName=false, isExtension=false, isTopLevel=true, name=foo]
     MODIFIER_LIST[]
-      ANNOTATION_ENTRY[hasValueArguments=false, shortName=Deprecated]
+      ANNOTATION_ENTRY[hasValueArguments=false, replacementForPatternName=null, shortName=Deprecated]
         CONSTRUCTOR_CALLEE
           TYPE_REFERENCE
             USER_TYPE

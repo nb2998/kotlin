@@ -748,6 +748,7 @@
     <stubIndex implementation="org.jetbrains.kotlin.idea.stubindex.KotlinScriptFqnIndex"/>
     <stubIndex implementation="org.jetbrains.kotlin.idea.stubindex.KotlinTypeAliasByExpansionShortNameIndex"/>
     <stubIndex implementation="org.jetbrains.kotlin.idea.stubindex.KotlinOverridableInternalMembersShortNameIndex"/>
+    <stubIndex implementation="org.jetbrains.kotlin.idea.stubindex.ReplacementForAnnotationIndex"/>
 
     <psi.classFileDecompiler implementation="org.jetbrains.kotlin.idea.decompiler.classFile.KotlinClassFileDecompiler"/>
     <psi.classFileDecompiler implementation="org.jetbrains.kotlin.idea.decompiler.js.KotlinJavaScriptMetaFileDecompiler"/>
@@ -2600,6 +2601,15 @@
                      groupName="Redundant constructs"
                      enabledByDefault="true"
                      cleanupTool="true"
+                     level="WEAK WARNING"
+                     language="kotlin"
+    />
+
+    <localInspection implementationClass="org.jetbrains.kotlin.idea.inspections.ReplacementForInspection"
+                     displayName="Replacement suggested by ReplacementFor annotation"
+                     groupPath="Kotlin"
+                     groupName="Other problems"
+                     enabledByDefault="true"
                      level="WEAK WARNING"
                      language="kotlin"
     />

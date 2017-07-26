@@ -44,10 +44,10 @@ import org.jetbrains.kotlin.types.expressions.ExpressionTypingServices
 
 data class PatternAnnotationData(val pattern: String, val imports: List<String>)
 
-data class ResolvablePattern(val pattern: KtExpression, val analyze: () -> BindingContext)
+data class ResolvablePattern(val expression: KtExpression, val analyze: () -> BindingContext)
 
 fun ResolvablePattern.toCodeToInline(symbolDescriptor: CallableDescriptor, resolutionFacade: ResolutionFacade): CodeToInline {
-    return CodeToInlineBuilder(symbolDescriptor.toOriginal(), resolutionFacade).prepareCodeToInline(pattern, emptyList(), analyze)
+    return CodeToInlineBuilder(symbolDescriptor.toOriginal(), resolutionFacade).prepareCodeToInline(expression, emptyList(), analyze)
 }
 
 fun PatternAnnotationData.analyzeAsExpression(symbolDescriptor: CallableDescriptor, resolutionFacade: ResolutionFacade): ResolvablePattern? {

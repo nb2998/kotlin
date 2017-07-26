@@ -60,7 +60,7 @@ public class KtAnnotationEntry extends KtElementImplStub<KotlinAnnotationEntrySt
     @Override
     public KtValueArgumentList getValueArgumentList() {
         KotlinAnnotationEntryStub stub = getStub();
-        if (stub != null && !stub.hasValueArguments()) {
+        if (stub != null && !stub.getHasValueArguments()) {
             return null;
         }
         return (KtValueArgumentList) findChildByType(KtNodeTypes.VALUE_ARGUMENT_LIST);

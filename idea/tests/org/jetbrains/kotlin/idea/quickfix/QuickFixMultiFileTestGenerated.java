@@ -1935,6 +1935,39 @@ public class QuickFixMultiFileTestGenerated extends AbstractQuickFixMultiFileTes
         }
     }
 
+    @TestMetadata("idea/testData/quickfix/replacementFor")
+    @TestDataPath("$PROJECT_ROOT")
+    @RunWith(JUnit3RunnerWithInners.class)
+    public static class ReplacementFor extends AbstractQuickFixMultiFileTest {
+        public void testAllFilesPresentInReplacementFor() throws Exception {
+            KotlinTestUtils.assertAllTestsPresentByMetadata(this.getClass(), new File("idea/testData/quickfix/replacementFor"), Pattern.compile("^(\\w+)\\.((before\\.Main\\.\\w+)|(test))$"), TargetBackend.ANY, true);
+        }
+
+        @TestMetadata("extensionForObject.before.Main.kt")
+        public void testExtensionForObject() throws Exception {
+            String fileName = KotlinTestUtils.navigationMetadata("idea/testData/quickfix/replacementFor/extensionForObject.before.Main.kt");
+            doTestWithExtraFile(fileName);
+        }
+
+        @TestMetadata("functionInObject.before.Main.kt")
+        public void testFunctionInObject() throws Exception {
+            String fileName = KotlinTestUtils.navigationMetadata("idea/testData/quickfix/replacementFor/functionInObject.before.Main.kt");
+            doTestWithExtraFile(fileName);
+        }
+
+        @TestMetadata("insertImportForExtension.before.Main.kt")
+        public void testInsertImportForExtension() throws Exception {
+            String fileName = KotlinTestUtils.navigationMetadata("idea/testData/quickfix/replacementFor/insertImportForExtension.before.Main.kt");
+            doTestWithExtraFile(fileName);
+        }
+
+        @TestMetadata("insertImportForTopLevelFun.before.Main.kt")
+        public void testInsertImportForTopLevelFun() throws Exception {
+            String fileName = KotlinTestUtils.navigationMetadata("idea/testData/quickfix/replacementFor/insertImportForTopLevelFun.before.Main.kt");
+            doTestWithExtraFile(fileName);
+        }
+    }
+
     @TestMetadata("idea/testData/quickfix/suppress")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)

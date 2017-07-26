@@ -39,6 +39,7 @@ import org.jetbrains.kotlin.util.TypeIndexUtilKt;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class IdeStubIndexService extends StubIndexService {
@@ -156,6 +157,12 @@ public class IdeStubIndexService extends StubIndexService {
             if (TypeIndexUtilKt.isProbablyNothing(stub.getPsi().getTypeReference())) {
                 sink.occurrence(KotlinProbablyNothingFunctionShortNameIndex.getInstance().getKey(), name);
             }
+        }
+
+        //TODO: better convert the whole file to Kotlin!
+        Collection<String> patternNames = IndexUtilsKt.extractReplacementForPatternNames(stub.getPsi());
+        for (String patternName : patternNames) {
+            sink.occurrence(ReplacementForAnnotationIndex.getInstance().getKey(), patternName);
         }
 
         if (stub.isTopLevel()) {
