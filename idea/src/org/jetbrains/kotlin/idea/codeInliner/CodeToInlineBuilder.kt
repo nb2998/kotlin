@@ -20,7 +20,7 @@ import org.jetbrains.kotlin.descriptors.CallableDescriptor
 import org.jetbrains.kotlin.descriptors.TypeParameterDescriptor
 import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor
 import org.jetbrains.kotlin.diagnostics.Errors
-import org.jetbrains.kotlin.idea.caches.resolve.getResolutionFacade
+import org.jetbrains.kotlin.idea.caches.resolve.analyze
 import org.jetbrains.kotlin.idea.core.asExpression
 import org.jetbrains.kotlin.idea.imports.importableFqName
 import org.jetbrains.kotlin.idea.intentions.InsertExplicitTypeArgumentsIntention
@@ -41,7 +41,6 @@ import org.jetbrains.kotlin.resolve.descriptorUtil.isExtension
 import org.jetbrains.kotlin.resolve.lazy.BodyResolveMode
 import org.jetbrains.kotlin.resolve.scopes.receivers.ImplicitReceiver
 import org.jetbrains.kotlin.types.ErrorUtils
-import org.jetbrains.kotlin.utils.sure
 import java.util.*
 
 class CodeToInlineBuilder(
@@ -64,14 +63,12 @@ class CodeToInlineBuilder(
 
         processReferences(codeToInline, bindingContext)
 
-        if (mainExpression != null) {
-            val functionLiteralExpression = mainExpression.unpackFunctionLiteral(true)
-            if (functionLiteralExpression != null) {
-                val functionLiteralParameterTypes = getParametersForFunctionLiteral(functionLiteralExpression, bindingContext)
-                if (functionLiteralParameterTypes != null) {
-                    codeToInline.addPostInsertionAction(mainExpression) { inlinedExpression ->
-                        addFunctionLiteralParameterTypes(functionLiteralParameterTypes, inlinedExpression)
-                    }
+        val functionLiteralExpression = codeToInline.mainExpression?.unpackFunctionLiteral(true)
+        if (functionLiteralExpression != null) {
+            val functionLiteralParameterTypes = getParametersForFunctionLiteral(functionLiteralExpression, bindingContext)
+            if (functionLiteralParameterTypes != null) {
+                codeToInline.addPostInsertionAction(functionLiteralExpression) { inlinedExpression ->
+                    addFunctionLiteralParameterTypes(functionLiteralParameterTypes, inlinedExpression)
                 }
             }
         }
@@ -87,23 +84,15 @@ class CodeToInlineBuilder(
         }
     }
 
-    private fun addFunctionLiteralParameterTypes(parameters: String, inlinedExpression: KtExpression) {
-        val containingFile = inlinedExpression.containingKtFile
-        val resolutionFacade = containingFile.getResolutionFacade()
-
-        val lambdaExpr = inlinedExpression.unpackFunctionLiteral(true).sure {
-            "can't find function literal expression for " + inlinedExpression.text
+    private fun addFunctionLiteralParameterTypes(parameters: String, inlinedExpression: KtLambdaExpression) {
+        if (needToAddParameterTypes(inlinedExpression)) {
+            SpecifyExplicitLambdaSignatureIntention.applyWithParameters(inlinedExpression, parameters)
         }
-        if (!needToAddParameterTypes(lambdaExpr, resolutionFacade)) return
-        SpecifyExplicitLambdaSignatureIntention.applyWithParameters(lambdaExpr, parameters)
     }
 
-    private fun needToAddParameterTypes(
-            lambdaExpression: KtLambdaExpression,
-            resolutionFacade: ResolutionFacade
-    ): Boolean {
+    private fun needToAddParameterTypes(lambdaExpression: KtLambdaExpression): Boolean {
         val functionLiteral = lambdaExpression.functionLiteral
-        val context = resolutionFacade.analyze(lambdaExpression, BodyResolveMode.PARTIAL_WITH_DIAGNOSTICS)
+        val context = lambdaExpression.analyze(BodyResolveMode.PARTIAL_WITH_DIAGNOSTICS)
         return context.diagnostics.any { diagnostic ->
             val factory = diagnostic.factory
             val element = diagnostic.psiElement
