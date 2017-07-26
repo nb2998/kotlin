@@ -53,6 +53,14 @@ public annotation class Deprecated(
 public annotation class ReplaceWith(val expression: String, vararg val imports: String)
 
 /**
+ * TODO
+ */
+@Target(FUNCTION) //TODO: what else?
+@Retention(BINARY)
+@MustBeDocumented
+public annotation class ReplacementFor(val expression: String, vararg val imports: String)
+
+/**
  * Contains levels for deprecation levels.
  */
 public enum class DeprecationLevel {

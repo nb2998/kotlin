@@ -623,6 +623,14 @@ public abstract class Number : kotlin.Any, java.io.Serializable {
         public final fun <get-imports>(): kotlin.Array<out kotlin.String>
 }
 
+@kotlin.annotation.Target(allowedTargets = {AnnotationTarget.FUNCTION}) @kotlin.annotation.Retention(value = AnnotationRetention.BINARY) @kotlin.annotation.MustBeDocumented public final annotation class ReplacementFor : kotlin.Annotation {
+    /*primary*/ public constructor ReplacementFor(/*0*/ expression: kotlin.String, /*1*/ vararg imports: kotlin.String /*kotlin.Array<out kotlin.String>*/)
+    public final val expression: kotlin.String
+        public final fun <get-expression>(): kotlin.String
+    public final val imports: kotlin.Array<out kotlin.String>
+        public final fun <get-imports>(): kotlin.Array<out kotlin.String>
+}
+
 public final class Short : kotlin.Number, kotlin.Comparable<kotlin.Short>, java.io.Serializable {
     /*primary*/ private constructor Short()
     public final operator fun compareTo(/*0*/ other: kotlin.Byte): kotlin.Int
