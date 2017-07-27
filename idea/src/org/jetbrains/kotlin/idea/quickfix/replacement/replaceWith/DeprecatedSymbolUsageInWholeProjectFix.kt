@@ -21,7 +21,7 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiFile
 import org.jetbrains.kotlin.diagnostics.Diagnostic
-import org.jetbrains.kotlin.idea.quickfix.replacement.PatternAnnotation
+import org.jetbrains.kotlin.idea.quickfix.replacement.PatternAnnotationData
 import org.jetbrains.kotlin.idea.codeInliner.UsageReplacementStrategy
 import org.jetbrains.kotlin.idea.codeInliner.replaceUsagesInWholeProject
 import org.jetbrains.kotlin.idea.quickfix.KotlinSingleIntentionActionFactory
@@ -33,9 +33,9 @@ import org.jetbrains.kotlin.renderer.ParameterNameRenderingPolicy
 
 class DeprecatedSymbolUsageInWholeProjectFix(
         element: KtSimpleNameExpression,
-        annotation: PatternAnnotation,
+        annotationData: PatternAnnotationData,
         private val text: String
-) : DeprecatedSymbolUsageFixBase(element, annotation) {
+) : DeprecatedSymbolUsageFixBase(element, annotationData) {
 
     override fun getFamilyName() = "Replace deprecated symbol usage in whole project"
 
