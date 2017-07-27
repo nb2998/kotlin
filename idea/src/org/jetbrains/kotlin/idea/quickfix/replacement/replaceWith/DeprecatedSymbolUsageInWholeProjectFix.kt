@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package org.jetbrains.kotlin.idea.quickfix.replaceWith
+package org.jetbrains.kotlin.idea.quickfix.replacement.replaceWith
 
 import com.intellij.codeInsight.intention.IntentionAction
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiFile
 import org.jetbrains.kotlin.diagnostics.Diagnostic
+import org.jetbrains.kotlin.idea.quickfix.replacement.PatternAnnotation
 import org.jetbrains.kotlin.idea.codeInliner.UsageReplacementStrategy
 import org.jetbrains.kotlin.idea.codeInliner.replaceUsagesInWholeProject
 import org.jetbrains.kotlin.idea.quickfix.KotlinSingleIntentionActionFactory
@@ -32,9 +33,9 @@ import org.jetbrains.kotlin.renderer.ParameterNameRenderingPolicy
 
 class DeprecatedSymbolUsageInWholeProjectFix(
         element: KtSimpleNameExpression,
-        replaceWith: ReplaceWith,
+        annotation: PatternAnnotation,
         private val text: String
-) : DeprecatedSymbolUsageFixBase(element, replaceWith) {
+) : DeprecatedSymbolUsageFixBase(element, annotation) {
 
     override fun getFamilyName() = "Replace deprecated symbol usage in whole project"
 

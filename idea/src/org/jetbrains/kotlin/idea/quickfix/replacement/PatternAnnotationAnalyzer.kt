@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.jetbrains.kotlin.idea.quickfix.replaceWith
+package org.jetbrains.kotlin.idea.quickfix.replacement
 
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.idea.analysis.analyzeInContext
@@ -40,13 +40,12 @@ import org.jetbrains.kotlin.resolve.scopes.utils.chainImportingScopes
 import org.jetbrains.kotlin.resolve.scopes.utils.memberScopeAsImportingScope
 import org.jetbrains.kotlin.storage.LockBasedStorageManager
 import org.jetbrains.kotlin.types.expressions.ExpressionTypingServices
-import java.util.*
 
-data class ReplaceWith(val pattern: String, val imports: List<String>)
+data class PatternAnnotation(val pattern: String, val imports: List<String>)
 
-object ReplaceWithAnnotationAnalyzer {
+object PatternAnnotationAnalyzer {
     fun analyzeCallableReplacement(
-            annotation: ReplaceWith,
+            annotation: PatternAnnotation,
             symbolDescriptor: CallableDescriptor,
             resolutionFacade: ResolutionFacade
     ): CodeToInline? {
@@ -58,7 +57,7 @@ object ReplaceWithAnnotationAnalyzer {
     }
 
     private fun analyzeOriginal(
-            annotation: ReplaceWith,
+            annotation: PatternAnnotation,
             symbolDescriptor: CallableDescriptor,
             resolutionFacade: ResolutionFacade
     ): CodeToInline? {
@@ -74,7 +73,7 @@ object ReplaceWithAnnotationAnalyzer {
         val explicitImportsScope = buildExplicitImportsScope(annotation, resolutionFacade, module)
         val defaultImportsScopes = buildDefaultImportsScopes(resolutionFacade, module)
         val scope = getResolutionScope(symbolDescriptor, symbolDescriptor,
-                                       listOf(explicitImportsScope) + defaultImportsScopes) ?: return null
+                                                                                                                listOf(explicitImportsScope) + defaultImportsScopes) ?: return null
 
         val expressionTypingServices = resolutionFacade.getFrontendService(module, ExpressionTypingServices::class.java)
 
@@ -84,7 +83,7 @@ object ReplaceWithAnnotationAnalyzer {
     }
 
     fun analyzeClassifierReplacement(
-            annotation: ReplaceWith,
+            annotation: PatternAnnotation,
             symbolDescriptor: ClassifierDescriptorWithTypeParameters,
             resolutionFacade: ResolutionFacade
     ): KtUserType? {
@@ -135,7 +134,7 @@ object ReplaceWithAnnotationAnalyzer {
                allUnderImports.map { module.getPackage(it.fqName).memberScope.memberScopeAsImportingScope() }.asReversed()
     }
 
-    private fun buildExplicitImportsScope(annotation: ReplaceWith, resolutionFacade: ResolutionFacade, module: ModuleDescriptor): ExplicitImportsScope {
+    private fun buildExplicitImportsScope(annotation: PatternAnnotation, resolutionFacade: ResolutionFacade, module: ModuleDescriptor): ExplicitImportsScope {
         return buildExplicitImportsScope(importFqNames(annotation), resolutionFacade, module)
     }
 
@@ -144,7 +143,7 @@ object ReplaceWithAnnotationAnalyzer {
         return ExplicitImportsScope(importedSymbols)
     }
 
-    private fun importFqNames(annotation: ReplaceWith): List<FqName> {
+    private fun importFqNames(annotation: PatternAnnotation): List<FqName> {
         return annotation.imports
                 .filter { FqNameUnsafe.isValid(it) }
                 .map(::FqNameUnsafe)

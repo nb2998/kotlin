@@ -31,7 +31,7 @@ import org.jetbrains.kotlin.idea.highlighter.KotlinPsiChecker
 import org.jetbrains.kotlin.idea.quickfix.CleanupFix
 import org.jetbrains.kotlin.idea.quickfix.KotlinQuickFixAction
 import org.jetbrains.kotlin.idea.quickfix.ReplaceObsoleteLabelSyntaxFix
-import org.jetbrains.kotlin.idea.quickfix.replaceWith.DeprecatedSymbolUsageFix
+import org.jetbrains.kotlin.idea.quickfix.replacement.replaceWith.DeprecatedSymbolUsageFix
 import org.jetbrains.kotlin.idea.util.ProjectRootsUtil
 import org.jetbrains.kotlin.js.resolve.diagnostics.ErrorsJs
 import org.jetbrains.kotlin.psi.KtAnnotationEntry
