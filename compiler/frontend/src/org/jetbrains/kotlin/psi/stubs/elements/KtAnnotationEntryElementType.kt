@@ -61,7 +61,7 @@ class KtAnnotationEntryElementType(
     private fun KtAnnotationEntry.replacementForPatternName(): String? {
         val referencedName = (calleeExpression?.typeReference?.typeElement as? KtUserType)?.referencedName ?: return null
         if (referencedName != "ReplacementFor") return null //TODO: import aliases
-        val firstArgument = valueArguments.firstOrNull()?.getArgumentExpression() as? KtStringTemplateExpression ?: return null //TODO: named arguments!
+        val firstArgument = extractExpressionFromReplacementForAnnotation(this) as? KtStringTemplateExpression ?: return null
         val expression = try {
             //TODO: escape entries
             KtPsiFactory(project).createExpression(firstArgument.plainContent)
@@ -81,4 +81,14 @@ class KtAnnotationEntryElementType(
             else -> null
         }
     }
+}
+
+fun extractExpressionFromReplacementForAnnotation(entry: KtAnnotationEntry): KtExpression? {
+    val arguments = entry.valueArguments
+    val first = arguments.firstOrNull() ?: return null
+    val argument = if (!first.isNamed())
+        first
+    else
+        arguments.firstOrNull { it.getArgumentName()?.asName?.asString() == "expression" }
+    return argument?.getArgumentExpression()
 }
