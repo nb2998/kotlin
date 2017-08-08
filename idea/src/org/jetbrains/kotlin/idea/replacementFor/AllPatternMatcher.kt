@@ -22,6 +22,7 @@ import org.jetbrains.kotlin.descriptors.CallableDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.annotations.AnnotationDescriptor
 import org.jetbrains.kotlin.idea.caches.resolve.resolveToDescriptor
+import org.jetbrains.kotlin.idea.caches.resolve.resolveToDescriptorIfAny
 import org.jetbrains.kotlin.idea.quickfix.replacement.PatternAnnotationData
 import org.jetbrains.kotlin.idea.quickfix.replacement.analyzeAsExpression
 import org.jetbrains.kotlin.idea.resolve.ResolutionFacade
@@ -37,6 +38,7 @@ import org.jetbrains.kotlin.resolve.annotations.argumentValue
 import org.jetbrains.kotlin.resolve.constants.StringValue
 import org.jetbrains.kotlin.utils.SmartList
 import org.jetbrains.kotlin.utils.addIfNotNull
+import org.jetbrains.kotlin.utils.getOrPutNullable
 
 //TODO: code duplication
 private fun KtExpression.callNameExpression(): KtNameReferenceExpression? {
@@ -53,6 +55,10 @@ class AllPatternMatcher(
         private val resolutionFacade: ResolutionFacade
 ) {
 
+    private data class MatcherKey(val descriptor: FunctionDescriptor, val patternData: PatternAnnotationData)
+
+    private val matchers = HashMap<MatcherKey, PatternMatcher?>()
+
     fun match(expression: KtExpression, bindingContext: BindingContext): Collection<ReplacementForPatternMatch> {
         val name = expression.callNameExpression()?.getReferencedName() ?: return emptyList()
         //TODO: check if it works in compiled code
@@ -60,12 +66,14 @@ class AllPatternMatcher(
         val result = SmartList<ReplacementForPatternMatch>()
         for (declaration in functionDeclarations) {
             if (declaration.isAncestor(expression)) continue // do not replace inside the function which is annotated by this @ReplacementFor
-            val descriptor = declaration.resolveToDescriptor() as FunctionDescriptor
+            val descriptor = declaration.resolveToDescriptorIfAny() as FunctionDescriptor? ?: continue
             val patterns = extractReplacementForPatterns(descriptor)
             for (pattern in patterns) {
-                //TODO: cache matchers and resolvable patterns
-                val resolvablePattern = pattern.analyzeAsExpression(descriptor, resolutionFacade) ?: continue
-                val matcher = PatternMatcher(descriptor, resolvablePattern.expression, resolvablePattern.analyze)
+                val matcher = matchers.getOrPutNullable(MatcherKey(descriptor, pattern)) {
+                    val resolvablePattern = pattern.analyzeAsExpression(descriptor, resolutionFacade)
+                                            ?: return@getOrPutNullable null
+                    PatternMatcher(descriptor, resolvablePattern.expression, resolvablePattern.analyze)
+                } ?: continue
                 result.addIfNotNull(matcher.matchExpression(expression, bindingContext, pattern))
             }
         }
