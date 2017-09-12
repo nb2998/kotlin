@@ -21,6 +21,7 @@ import com.intellij.openapi.module.impl.scopes.LibraryScopeBase
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.openapi.roots.*
+import com.intellij.openapi.roots.impl.ModuleOrderEntryImpl
 import com.intellij.openapi.roots.impl.libraries.LibraryEx
 import com.intellij.openapi.roots.libraries.Library
 import com.intellij.openapi.util.ModificationTracker
@@ -58,8 +59,8 @@ interface IdeaModuleInfo : ModuleInfo {
     override fun dependencies(): List<IdeaModuleInfo>
 }
 
-private fun orderEntryToModuleInfo(project: Project, orderEntry: OrderEntry, productionOnly: Boolean): List<IdeaModuleInfo> {
-    fun Module.toInfos() = correspondingModuleInfos().filter { !productionOnly || it is ModuleProductionSourceInfo }
+private fun orderEntryToModuleInfo(project: Project, orderEntry: OrderEntry, forProduction: Boolean): List<IdeaModuleInfo> {
+    fun Module.toInfos() = correspondingModuleInfos().filter { !forProduction || it is ModuleProductionSourceInfo }
 
     if (!orderEntry.isValid) return emptyList()
 
@@ -68,7 +69,13 @@ private fun orderEntryToModuleInfo(project: Project, orderEntry: OrderEntry, pro
             orderEntry.getOwnerModule().toInfos()
         }
         is ModuleOrderEntry -> {
-            orderEntry.module?.toInfos().orEmpty()
+            val module = orderEntry.module ?: return emptyList()
+            if (forProduction && module is ModuleOrderEntryImpl && module.isProductionOnTestDependency) {
+                listOfNotNull(module.testSourceInfo())
+            }
+            else {
+                module.toInfos()
+            }
         }
         is LibraryOrderEntry -> {
             val library = orderEntry.library ?: return listOf()
@@ -88,16 +95,22 @@ fun <T> Module.cached(provider: CachedValueProvider<T>): T {
     return CachedValuesManager.getManager(project).getCachedValue(this, provider)
 }
 
-private fun ideaModelDependencies(module: Module, productionOnly: Boolean): List<IdeaModuleInfo> {
+private fun OrderEntry.acceptAsDependency(forProduction: Boolean): Boolean {
+    return this !is ExportableOrderEntry
+        || !forProduction
+        // this is needed for Maven/Gradle projects with "production-on-test" dependency
+        || this is ModuleOrderEntryImpl && isProductionOnTestDependency
+        || scope.isForProductionCompile
+}
+
+private fun ideaModelDependencies(module: Module, forProduction: Boolean): List<IdeaModuleInfo> {
     //NOTE: lib dependencies can be processed several times during recursive traversal
     val result = LinkedHashSet<IdeaModuleInfo>()
     val dependencyEnumerator = ModuleRootManager.getInstance(module).orderEntries().compileOnly().recursively().exportedOnly()
-    if (productionOnly) {
-        dependencyEnumerator.productionOnly()
-    }
-    dependencyEnumerator.forEach {
-        orderEntry ->
-        result.addAll(orderEntryToModuleInfo(module.project, orderEntry!!, productionOnly))
+    dependencyEnumerator.forEach { orderEntry ->
+        if (orderEntry.acceptAsDependency(forProduction)) {
+            result.addAll(orderEntryToModuleInfo(module.project, orderEntry!!, forProduction))
+        }
         true
     }
     return result.toList()
@@ -125,7 +138,7 @@ data class ModuleProductionSourceInfo internal constructor(override val module: 
 
     override fun dependencies() = module.cached(CachedValueProvider {
         CachedValueProvider.Result(
-                ideaModelDependencies(module, productionOnly = true),
+                ideaModelDependencies(module, forProduction = true),
                 ProjectRootModificationTracker.getInstance(module.project))
     })
 }
@@ -140,7 +153,7 @@ data class ModuleTestSourceInfo internal constructor(override val module: Module
 
     override fun dependencies() = module.cached(CachedValueProvider {
         CachedValueProvider.Result(
-                ideaModelDependencies(module, productionOnly = false),
+                ideaModelDependencies(module, forProduction = false),
                 ProjectRootModificationTracker.getInstance(module.project))
     })
 
