@@ -30,6 +30,7 @@ import org.jetbrains.kotlin.load.kotlin.*
 import org.jetbrains.kotlin.load.kotlin.header.KotlinClassHeader
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.FqName
+import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.stubs.KotlinStubVersions
 import org.jetbrains.kotlin.serialization.ProtoBuf
@@ -37,6 +38,7 @@ import org.jetbrains.kotlin.serialization.deserialization.NameResolver
 import org.jetbrains.kotlin.serialization.deserialization.TypeTable
 import org.jetbrains.kotlin.serialization.jvm.JvmProtoBufUtil
 import org.jetbrains.kotlin.storage.LockBasedStorageManager
+import java.util.*
 
 open class KotlinClsStubBuilder : ClsStubBuilder() {
     override fun getStubVersion() = ClassFileStubBuilder.STUB_VERSION + KotlinStubVersions.CLASSFILE_STUB_VERSION
@@ -108,7 +110,7 @@ class AnnotationLoaderForClassFileStubBuilder(
         kotlinClassFinder: KotlinClassFinder,
         private val cachedFile: VirtualFile,
         private val cachedFileContent: ByteArray
-) : AbstractBinaryClassAnnotationAndConstantLoader<ClassId, Unit, ClassIdWithTarget>(LockBasedStorageManager.NO_LOCKS, kotlinClassFinder) {
+) : AbstractBinaryClassAnnotationAndConstantLoader<AnnotationInfo, Any, AnnotationInfoWithTarget>(LockBasedStorageManager.NO_LOCKS, kotlinClassFinder) {
 
     override fun getCachedFileContent(kotlinClass: KotlinJvmBinaryClass): ByteArray? {
         if ((kotlinClass as? VirtualFileKotlinClass)?.file == cachedFile) {
@@ -117,24 +119,52 @@ class AnnotationLoaderForClassFileStubBuilder(
         return null
     }
 
-    override fun loadTypeAnnotation(proto: ProtoBuf.Annotation, nameResolver: NameResolver): ClassId =
-            nameResolver.getClassId(proto.id)
+    override fun loadTypeAnnotation(proto: ProtoBuf.Annotation, nameResolver: NameResolver): AnnotationInfo =
+            AnnotationInfo(nameResolver.getClassId(proto.id), emptyMap()/*TODO: not supported currently*/)
 
-    override fun loadConstant(desc: String, initializer: Any) = null
+    override fun loadConstant(desc: String, initializer: Any) = initializer
 
     override fun loadAnnotation(
-            annotationClassId: ClassId, source: SourceElement, result: MutableList<ClassId>
+            annotationClassId: ClassId,
+            source: SourceElement,
+            result: MutableList<AnnotationInfo>
     ): KotlinJvmBinaryClass.AnnotationArgumentVisitor? {
-        result.add(annotationClassId)
-        return null
+        return object : KotlinJvmBinaryClass.AnnotationArgumentVisitor {
+            private val arguments = HashMap<Name, Any?>()
+
+            override fun visit(name: Name?, value: Any?) {
+                if (name != null) {
+                    arguments[name] = value
+                }
+            }
+
+            override fun visitEnum(name: Name, enumClassId: ClassId, enumEntryName: Name) {
+                //TODO: not supported currently
+            }
+
+            override fun visitArray(name: Name): KotlinJvmBinaryClass.AnnotationArrayArgumentVisitor? {
+                return null //TODO: not supported currently
+            }
+
+            override fun visitAnnotation(name: Name, classId: ClassId): KotlinJvmBinaryClass.AnnotationArgumentVisitor? {
+                return null //TODO: not supported currently
+            }
+            
+            override fun visitEnd() {
+                result.add(AnnotationInfo(annotationClassId, arguments))
+            }
+        }
     }
 
     override fun loadPropertyAnnotations(
-            propertyAnnotations: List<ClassId>, fieldAnnotations: List<ClassId>, fieldUseSiteTarget: AnnotationUseSiteTarget
-    ): List<ClassIdWithTarget> {
-        return propertyAnnotations.map { ClassIdWithTarget(it, null) } +
-               fieldAnnotations.map { ClassIdWithTarget(it, fieldUseSiteTarget ) }
+            propertyAnnotations: List<AnnotationInfo>,
+            fieldAnnotations: List<AnnotationInfo>,
+            fieldUseSiteTarget: AnnotationUseSiteTarget
+    ): List<AnnotationInfoWithTarget> {
+        return propertyAnnotations.map { AnnotationInfoWithTarget(it, null) } +
+               fieldAnnotations.map { AnnotationInfoWithTarget(it, fieldUseSiteTarget ) }
     }
 
-    override fun transformAnnotations(annotations: List<ClassId>) = annotations.map { ClassIdWithTarget(it, null) }
+    override fun transformAnnotations(annotations: List<AnnotationInfo>): List<AnnotationInfoWithTarget> =
+            annotations.map { AnnotationInfoWithTarget(it, null) }
 }

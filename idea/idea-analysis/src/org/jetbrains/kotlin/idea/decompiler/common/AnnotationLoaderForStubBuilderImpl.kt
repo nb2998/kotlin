@@ -16,8 +16,8 @@
 
 package org.jetbrains.kotlin.idea.decompiler.common
 
-import org.jetbrains.kotlin.idea.decompiler.stubBuilder.ClassIdWithTarget
-import org.jetbrains.kotlin.name.ClassId
+import org.jetbrains.kotlin.idea.decompiler.stubBuilder.AnnotationInfo
+import org.jetbrains.kotlin.idea.decompiler.stubBuilder.AnnotationInfoWithTarget
 import org.jetbrains.kotlin.protobuf.MessageLite
 import org.jetbrains.kotlin.serialization.ProtoBuf
 import org.jetbrains.kotlin.serialization.SerializerExtensionProtocol
@@ -27,18 +27,19 @@ import org.jetbrains.kotlin.serialization.deserialization.NameResolver
 import org.jetbrains.kotlin.serialization.deserialization.ProtoContainer
 import org.jetbrains.kotlin.types.KotlinType
 
+//TODO: support loading of annotation arguments
 class AnnotationLoaderForStubBuilderImpl(
         private val protocol: SerializerExtensionProtocol
-) : AnnotationAndConstantLoader<ClassId, Unit, ClassIdWithTarget> {
+) : AnnotationAndConstantLoader<AnnotationInfo, Any, AnnotationInfoWithTarget> {
 
-    override fun loadClassAnnotations(container: ProtoContainer.Class): List<ClassId> =
-         container.classProto.getExtension(protocol.classAnnotation).orEmpty().map { container.nameResolver.getClassId(it.id) }
+    override fun loadClassAnnotations(container: ProtoContainer.Class): List<AnnotationInfo> =
+         container.classProto.getExtension(protocol.classAnnotation).orEmpty().map { AnnotationInfo(container.nameResolver.getClassId(it.id), emptyMap()) }
 
     override fun loadCallableAnnotations(
             container: ProtoContainer,
             proto: MessageLite,
             kind: AnnotatedCallableKind
-    ): List<ClassIdWithTarget> {
+    ): List<AnnotationInfoWithTarget> {
         val annotations = when (proto) {
             is ProtoBuf.Constructor -> proto.getExtension(protocol.constructorAnnotation)
             is ProtoBuf.Function -> proto.getExtension(protocol.functionAnnotation)
@@ -46,12 +47,12 @@ class AnnotationLoaderForStubBuilderImpl(
             else -> error("Unknown message: $proto")
         }.orEmpty()
         return annotations.map {
-            ClassIdWithTarget(container.nameResolver.getClassId(it.id), null)
+            AnnotationInfoWithTarget(AnnotationInfo(container.nameResolver.getClassId(it.id), emptyMap()), null)
         }
     }
 
-    override fun loadEnumEntryAnnotations(container: ProtoContainer, proto: ProtoBuf.EnumEntry): List<ClassId> =
-            proto.getExtension(protocol.enumEntryAnnotation).orEmpty().map { container.nameResolver.getClassId(it.id) }
+    override fun loadEnumEntryAnnotations(container: ProtoContainer, proto: ProtoBuf.EnumEntry): List<AnnotationInfo> =
+            proto.getExtension(protocol.enumEntryAnnotation).orEmpty().map { AnnotationInfo(container.nameResolver.getClassId(it.id), emptyMap()) }
 
     override fun loadValueParameterAnnotations(
             container: ProtoContainer,
@@ -59,23 +60,23 @@ class AnnotationLoaderForStubBuilderImpl(
             kind: AnnotatedCallableKind,
             parameterIndex: Int,
             proto: ProtoBuf.ValueParameter
-    ): List<ClassId> =
-            proto.getExtension(protocol.parameterAnnotation).orEmpty().map { container.nameResolver.getClassId(it.id) }
+    ): List<AnnotationInfo> =
+            proto.getExtension(protocol.parameterAnnotation).orEmpty().map { AnnotationInfo(container.nameResolver.getClassId(it.id), emptyMap()) }
 
     override fun loadExtensionReceiverParameterAnnotations(
             container: ProtoContainer,
             proto: MessageLite,
             kind: AnnotatedCallableKind
-    ): List<ClassId> = emptyList()
+    ): List<AnnotationInfo> = emptyList()
 
     override fun loadTypeAnnotations(
             proto: ProtoBuf.Type,
             nameResolver: NameResolver
-    ): List<ClassId> =
-            proto.getExtension(protocol.typeAnnotation).orEmpty().map { nameResolver.getClassId(it.id) }
+    ): List<AnnotationInfo> =
+            proto.getExtension(protocol.typeAnnotation).orEmpty().map { AnnotationInfo(nameResolver.getClassId(it.id), emptyMap()) }
 
-    override fun loadTypeParameterAnnotations(proto: ProtoBuf.TypeParameter, nameResolver: NameResolver): List<ClassId> =
-        proto.getExtension(protocol.typeParameterAnnotation).orEmpty().map { nameResolver.getClassId(it.id) }
+    override fun loadTypeParameterAnnotations(proto: ProtoBuf.TypeParameter, nameResolver: NameResolver): List<AnnotationInfo> =
+        proto.getExtension(protocol.typeParameterAnnotation).orEmpty().map { AnnotationInfo(nameResolver.getClassId(it.id), emptyMap()) }
 
     override fun loadPropertyConstant(
             container: ProtoContainer,

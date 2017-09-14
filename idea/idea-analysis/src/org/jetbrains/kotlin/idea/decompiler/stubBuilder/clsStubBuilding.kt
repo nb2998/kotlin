@@ -16,6 +16,7 @@
 
 package org.jetbrains.kotlin.idea.decompiler.stubBuilder
 
+import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiElement
 import com.intellij.psi.stubs.StubElement
 import com.intellij.util.io.StringRef
@@ -34,6 +35,7 @@ import org.jetbrains.kotlin.protobuf.MessageLite
 import org.jetbrains.kotlin.psi.*
 import org.jetbrains.kotlin.psi.stubs.KotlinUserTypeStub
 import org.jetbrains.kotlin.psi.stubs.elements.KtStubElementTypes
+import org.jetbrains.kotlin.psi.stubs.elements.replacementForPatternName
 import org.jetbrains.kotlin.psi.stubs.impl.*
 import org.jetbrains.kotlin.resolve.jvm.JvmClassName
 import org.jetbrains.kotlin.serialization.ProtoBuf
@@ -202,31 +204,36 @@ fun createEmptyModifierListStub(parent: KotlinStubBaseImpl<*>): KotlinModifierLi
     )
 }
 
-fun createAnnotationStubs(annotationIds: List<ClassId>, parent: KotlinStubBaseImpl<*>) {
-    return createTargetedAnnotationStubs(annotationIds.map { ClassIdWithTarget(it, null) }, parent)
+fun createAnnotationStubs(annotationInfos: List<AnnotationInfo>, parent: KotlinStubBaseImpl<*>) {
+    return createTargetedAnnotationStubs(annotationInfos.map { AnnotationInfoWithTarget(it, null) }, parent)
 }
 
 fun createTargetedAnnotationStubs(
-        annotationIds: List<ClassIdWithTarget>,
+        annotationInfos: List<AnnotationInfoWithTarget>,
         parent: KotlinStubBaseImpl<*>
 ) {
-    if (annotationIds.isEmpty()) return
+    if (annotationInfos.isEmpty()) return
 
-    annotationIds.forEach { annotation ->
-        val (annotationClassId, target) = annotation
+    annotationInfos.forEach { (info, target) ->
         val annotationEntryStubImpl = KotlinAnnotationEntryStubImpl(
                 parent,
-                shortName = annotationClassId.shortClassName.asString(),
-                hasValueArguments = false,
-                replacementForPatternName = null
+                shortName = info.classId.shortClassName.asString(),
+                hasValueArguments = false, // arguments are not really supported yet
+                replacementForPatternName = replacementForPatternName(info, parent.project)
         )
         if (target != null) {
             KotlinAnnotationUseSiteTargetStubImpl(annotationEntryStubImpl, StringRef.fromString(target.name)!!)
         }
         val constructorCallee = KotlinPlaceHolderStubImpl<KtConstructorCalleeExpression>(annotationEntryStubImpl, KtStubElementTypes.CONSTRUCTOR_CALLEE)
         val typeReference = KotlinPlaceHolderStubImpl<KtTypeReference>(constructorCallee, KtStubElementTypes.TYPE_REFERENCE)
-        createStubForTypeName(annotationClassId, typeReference)
+        createStubForTypeName(info.classId, typeReference)
     }
+}
+
+private fun replacementForPatternName(annotationInfo: AnnotationInfo, project: Project): String? {
+    if (annotationInfo.classId.asSingleFqName().asString() != "kotlin.ReplacementFor") return null
+    val pattern = annotationInfo.arguments[Name.identifier("expression")] as? String ?: return null
+    return replacementForPatternName(pattern, project)
 }
 
 val MessageLite.annotatedCallableKind: AnnotatedCallableKind

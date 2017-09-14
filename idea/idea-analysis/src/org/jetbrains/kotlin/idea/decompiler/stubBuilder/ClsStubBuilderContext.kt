@@ -24,11 +24,13 @@ import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.serialization.ProtoBuf
 import org.jetbrains.kotlin.serialization.deserialization.*
 
-data class ClassIdWithTarget(val classId: ClassId, val target: AnnotationUseSiteTarget?)
+data class AnnotationInfo(val classId: ClassId, val arguments: Map<Name, Any?>)
+
+data class AnnotationInfoWithTarget(val info: AnnotationInfo, val target: AnnotationUseSiteTarget?)
 
 class ClsStubBuilderComponents(
         val classDataFinder: ClassDataFinder,
-        val annotationLoader: AnnotationAndConstantLoader<ClassId, Unit, ClassIdWithTarget>,
+        val annotationLoader: AnnotationAndConstantLoader<AnnotationInfo, Any, AnnotationInfoWithTarget>,
         val virtualFileForDebug: VirtualFile
 ) {
     fun createContext(

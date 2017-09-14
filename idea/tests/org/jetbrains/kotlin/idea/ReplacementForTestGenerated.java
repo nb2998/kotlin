@@ -119,4 +119,19 @@ public class ReplacementForTestGenerated extends AbstractReplacementForTest {
         String fileName = KotlinTestUtils.navigationMetadata("idea/testData/replacementFor/Simple.kt");
         doTest(fileName);
     }
+
+    @TestMetadata("idea/testData/replacementFor/stdlib")
+    @TestDataPath("$PROJECT_ROOT")
+    @RunWith(JUnit3RunnerWithInners.class)
+    public static class Stdlib extends AbstractReplacementForTest {
+        public void testAllFilesPresentInStdlib() throws Exception {
+            KotlinTestUtils.assertAllTestsPresentByMetadata(this.getClass(), new File("idea/testData/replacementFor/stdlib"), Pattern.compile("^(.+)\\.kt$"), TargetBackend.ANY, true);
+        }
+
+        @TestMetadata("CreateTempFile.kt")
+        public void testCreateTempFile() throws Exception {
+            String fileName = KotlinTestUtils.navigationMetadata("idea/testData/replacementFor/stdlib/CreateTempFile.kt");
+            doTest(fileName);
+        }
+    }
 }

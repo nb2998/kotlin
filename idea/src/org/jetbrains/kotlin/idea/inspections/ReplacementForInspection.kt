@@ -23,7 +23,6 @@ import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiElementVisitor
 import org.jetbrains.kotlin.idea.caches.resolve.analyze
-import org.jetbrains.kotlin.idea.caches.resolve.getResolutionFacade
 import org.jetbrains.kotlin.idea.replacementFor.AllPatternMatcher
 import org.jetbrains.kotlin.idea.replacementFor.ReplacementForPatternMatch
 import org.jetbrains.kotlin.idea.replacementFor.replaceExpression
@@ -36,7 +35,7 @@ import org.jetbrains.kotlin.resolve.lazy.BodyResolveMode
 class ReplacementForInspection : AbstractKotlinInspection() {
     override fun buildVisitor(holder: ProblemsHolder, isOnTheFly: Boolean): PsiElementVisitor {
         val ktFile = holder.file as? KtFile ?: return PsiElementVisitor.EMPTY_VISITOR
-        val matcher = AllPatternMatcher(holder.project, ktFile.getResolutionFacade())
+        val matcher = AllPatternMatcher(ktFile)
 
         return object: KtVisitorVoid() {
             override fun visitExpression(expression: KtExpression) {
@@ -62,7 +61,7 @@ class ReplacementForInspection : AbstractKotlinInspection() {
 
         override fun applyFix(project: Project, descriptor: ProblemDescriptor) {
             val expression = descriptor.psiElement as? KtExpression ?: return
-            val matcher = AllPatternMatcher(project, expression.getResolutionFacade())
+            val matcher = AllPatternMatcher(expression.containingKtFile)
             val bindingContext = expression.analyze(BodyResolveMode.PARTIAL)
             val matches = matcher.match(expression, bindingContext)
             val sameMatch = matches.firstOrNull { id(it) == matchId } ?: return // something changed

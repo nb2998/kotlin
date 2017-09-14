@@ -8,126 +8,147 @@ import java.io.BufferedReader
 
 /** Prints the given message to the standard output stream. */
 @kotlin.internal.InlineOnly
+@ReplacementFor("System.out.print(message)")
 public inline fun print(message: Any?) {
     System.out.print(message)
 }
 
 /** Prints the given message to the standard output stream. */
 @kotlin.internal.InlineOnly
+@ReplacementFor("System.out.print(message)")
 public inline fun print(message: Int) {
     System.out.print(message)
 }
 
 /** Prints the given message to the standard output stream. */
 @kotlin.internal.InlineOnly
+@ReplacementFor("System.out.print(message)")
 public inline fun print(message: Long) {
     System.out.print(message)
 }
 
 /** Prints the given message to the standard output stream. */
 @kotlin.internal.InlineOnly
+@ReplacementFor("System.out.print(message)")
 public inline fun print(message: Byte) {
     System.out.print(message)
 }
 
 /** Prints the given message to the standard output stream. */
 @kotlin.internal.InlineOnly
+@ReplacementFor("System.out.print(message)")
 public inline fun print(message: Short) {
     System.out.print(message)
 }
 
 /** Prints the given message to the standard output stream. */
 @kotlin.internal.InlineOnly
+@ReplacementFor("System.out.print(message)")
 public inline fun print(message: Char) {
     System.out.print(message)
 }
 
 /** Prints the given message to the standard output stream. */
 @kotlin.internal.InlineOnly
+@ReplacementFor("System.out.print(message)")
 public inline fun print(message: Boolean) {
     System.out.print(message)
 }
 
 /** Prints the given message to the standard output stream. */
 @kotlin.internal.InlineOnly
+@ReplacementFor("System.out.print(message)")
 public inline fun print(message: Float) {
     System.out.print(message)
 }
 
 /** Prints the given message to the standard output stream. */
 @kotlin.internal.InlineOnly
+@ReplacementFor("System.out.print(message)")
 public inline fun print(message: Double) {
     System.out.print(message)
 }
 
 /** Prints the given message to the standard output stream. */
 @kotlin.internal.InlineOnly
+@ReplacementFor("System.out.print(message)")
 public inline fun print(message: CharArray) {
     System.out.print(message)
 }
 
 /** Prints the given message and newline to the standard output stream. */
 @kotlin.internal.InlineOnly
+@ReplacementFor("System.out.println(message)")
 public inline fun println(message: Any?) {
     System.out.println(message)
 }
 
 /** Prints the given message and newline to the standard output stream. */
 @kotlin.internal.InlineOnly
+@ReplacementFor("System.out.println(message)")
 public inline fun println(message: Int) {
     System.out.println(message)
 }
 
 /** Prints the given message and newline to the standard output stream. */
 @kotlin.internal.InlineOnly
+@ReplacementFor("System.out.println(message)")
 public inline fun println(message: Long) {
     System.out.println(message)
 }
 
 /** Prints the given message and newline to the standard output stream. */
 @kotlin.internal.InlineOnly
+@ReplacementFor("System.out.println(message)")
 public inline fun println(message: Byte) {
     System.out.println(message)
 }
 
 /** Prints the given message and newline to the standard output stream. */
 @kotlin.internal.InlineOnly
+@ReplacementFor("System.out.println(message)")
 public inline fun println(message: Short) {
     System.out.println(message)
 }
 
 /** Prints the given message and newline to the standard output stream. */
 @kotlin.internal.InlineOnly
+@ReplacementFor("System.out.println(message)")
 public inline fun println(message: Char) {
     System.out.println(message)
 }
 
 /** Prints the given message and newline to the standard output stream. */
 @kotlin.internal.InlineOnly
+@ReplacementFor("System.out.println(message)")
 public inline fun println(message: Boolean) {
     System.out.println(message)
 }
 
 /** Prints the given message and newline to the standard output stream. */
 @kotlin.internal.InlineOnly
+@ReplacementFor("System.out.println(message)")
 public inline fun println(message: Float) {
     System.out.println(message)
 }
 
 /** Prints the given message and newline to the standard output stream. */
 @kotlin.internal.InlineOnly
+@ReplacementFor("System.out.println(message)")
 public inline fun println(message: Double) {
     System.out.println(message)
 }
 
 /** Prints the given message and newline to the standard output stream. */
 @kotlin.internal.InlineOnly
+@ReplacementFor("System.out.println(message)")
 public inline fun println(message: CharArray) {
     System.out.println(message)
 }
 
 /** Prints a newline to the standard output stream. */
 @kotlin.internal.InlineOnly
+@ReplacementFor("System.out.println()")
 public inline fun println() {
     System.out.println()
 }

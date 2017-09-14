@@ -16,22 +16,18 @@
 
 package org.jetbrains.kotlin.idea.replacementFor
 
-import com.intellij.openapi.project.Project
+import com.intellij.openapi.module.ModuleUtilCore
 import com.intellij.psi.search.GlobalSearchScope
 import org.jetbrains.kotlin.descriptors.CallableDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.annotations.AnnotationDescriptor
-import org.jetbrains.kotlin.idea.caches.resolve.resolveToDescriptor
-import org.jetbrains.kotlin.idea.caches.resolve.resolveToDescriptorIfAny
+import org.jetbrains.kotlin.idea.caches.resolve.getResolutionFacade
+import org.jetbrains.kotlin.idea.core.KotlinIndicesHelper
 import org.jetbrains.kotlin.idea.quickfix.replacement.PatternAnnotationData
 import org.jetbrains.kotlin.idea.quickfix.replacement.analyzeAsExpression
-import org.jetbrains.kotlin.idea.resolve.ResolutionFacade
 import org.jetbrains.kotlin.idea.stubindex.ReplacementForAnnotationIndex
 import org.jetbrains.kotlin.name.FqName
-import org.jetbrains.kotlin.psi.KtCallExpression
-import org.jetbrains.kotlin.psi.KtExpression
-import org.jetbrains.kotlin.psi.KtNameReferenceExpression
-import org.jetbrains.kotlin.psi.KtQualifiedExpression
+import org.jetbrains.kotlin.psi.*
 import org.jetbrains.kotlin.psi.psiUtil.isAncestor
 import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.annotations.argumentValue
@@ -50,31 +46,36 @@ private fun KtExpression.callNameExpression(): KtNameReferenceExpression? {
     }
 }
 
-class AllPatternMatcher(
-        private val project: Project,
-        private val resolutionFacade: ResolutionFacade
-) {
+class AllPatternMatcher(private val file: KtFile) {
+    private val resolutionFacade = file.getResolutionFacade()
+    private val searchScope = ModuleUtilCore.findModuleForFile(file.virtualFile, file.project)
+            ?.let { GlobalSearchScope.moduleWithDependenciesAndLibrariesScope(it) } ?: GlobalSearchScope.EMPTY_SCOPE
+    private val indicesHelper = KotlinIndicesHelper(resolutionFacade, searchScope, { true })
 
     private data class MatcherKey(val descriptor: FunctionDescriptor, val patternData: PatternAnnotationData)
 
     private val matchers = HashMap<MatcherKey, PatternMatcher?>()
 
+
     fun match(expression: KtExpression, bindingContext: BindingContext): Collection<ReplacementForPatternMatch> {
         val name = expression.callNameExpression()?.getReferencedName() ?: return emptyList()
-        //TODO: check if it works in compiled code
-        val functionDeclarations = ReplacementForAnnotationIndex.getInstance().get(name, project, GlobalSearchScope.allScope(project))
+        val functionDeclarations = ReplacementForAnnotationIndex.getInstance().get(name, file.project, searchScope)
         val result = SmartList<ReplacementForPatternMatch>()
         for (declaration in functionDeclarations) {
             if (declaration.isAncestor(expression)) continue // do not replace inside the function which is annotated by this @ReplacementFor
-            val descriptor = declaration.resolveToDescriptorIfAny() as FunctionDescriptor? ?: continue
-            val patterns = extractReplacementForPatterns(descriptor)
-            for (pattern in patterns) {
-                val matcher = matchers.getOrPutNullable(MatcherKey(descriptor, pattern)) {
-                    val resolvablePattern = pattern.analyzeAsExpression(descriptor, resolutionFacade)
-                                            ?: return@getOrPutNullable null
-                    PatternMatcher(descriptor, resolvablePattern.expression, resolvablePattern.analyze)
-                } ?: continue
-                result.addIfNotNull(matcher.matchExpression(expression, bindingContext, pattern))
+
+            // TODO: TEMP hack!
+            val descriptors = with(indicesHelper) { declaration.resolveToDescriptorsWithHack<FunctionDescriptor>() }
+            for (descriptor in descriptors) {
+                val patterns = extractReplacementForPatterns(descriptor)
+                for (pattern in patterns) {
+                    val matcher = matchers.getOrPutNullable(MatcherKey(descriptor, pattern)) {
+                        val resolvablePattern = pattern.analyzeAsExpression(descriptor, resolutionFacade)
+                                                ?: return@getOrPutNullable null
+                        PatternMatcher(descriptor, resolvablePattern.expression, resolvablePattern.analyze)
+                    } ?: continue
+                    result.addIfNotNull(matcher.matchExpression(expression, bindingContext, pattern))
+                }
             }
         }
         return result

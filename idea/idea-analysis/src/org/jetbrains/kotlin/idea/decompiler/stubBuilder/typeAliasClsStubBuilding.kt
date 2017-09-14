@@ -52,7 +52,7 @@ fun createTypeAliasStub(
     }
 
     if (Flags.HAS_ANNOTATIONS.get(typeAliasProto.flags)) {
-        createAnnotationStubs(typeAliasProto.annotationList.map { context.nameResolver.getClassId(it.id) }, modifierList)
+        createAnnotationStubs(typeAliasProto.annotationList.map { AnnotationInfo(context.nameResolver.getClassId(it.id), emptyMap()) }, modifierList)
     }
 
     typeStubBuilder.createTypeReferenceStub(typeAlias, typeAliasProto.underlyingType)

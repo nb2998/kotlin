@@ -44,16 +44,16 @@ import java.util.*
 private val ANNOTATIONS_NOT_LOADED_FOR_TYPES = setOf(KotlinBuiltIns.FQ_NAMES.parameterName)
 
 class TypeClsStubBuilder(private val c: ClsStubBuilderContext) {
-    fun createTypeReferenceStub(parent: StubElement<out PsiElement>, type: Type, additionalAnnotations: () -> List<ClassIdWithTarget> = { emptyList() }) {
+    fun createTypeReferenceStub(parent: StubElement<out PsiElement>, type: Type, additionalAnnotations: () -> List<AnnotationInfoWithTarget> = { emptyList() }) {
         if (type.hasAbbreviatedType()) return createTypeReferenceStub(parent, type.abbreviatedType, additionalAnnotations)
         val typeReference = KotlinPlaceHolderStubImpl<KtTypeReference>(parent, KtStubElementTypes.TYPE_REFERENCE)
 
         val annotations = c.components.annotationLoader.loadTypeAnnotations(type, c.nameResolver).filterNot {
-            val isTopLevelClass = !it.isNestedClass
-            isTopLevelClass && it.asSingleFqName() in ANNOTATIONS_NOT_LOADED_FOR_TYPES
+            val isTopLevelClass = !it.classId.isNestedClass
+            isTopLevelClass && it.classId.asSingleFqName() in ANNOTATIONS_NOT_LOADED_FOR_TYPES
         }
 
-        val allAnnotations = additionalAnnotations() + annotations.map { ClassIdWithTarget(it, null) }
+        val allAnnotations = additionalAnnotations() + annotations.map { AnnotationInfoWithTarget(it, null) }
 
         when {
             type.hasClassName() || type.hasTypeAliasName() ->
@@ -69,12 +69,12 @@ class TypeClsStubBuilder(private val c: ClsStubBuilderContext) {
             if (type.nullable) KotlinPlaceHolderStubImpl<KtNullableType>(parent, KtStubElementTypes.NULLABLE_TYPE)
             else parent
 
-    private fun createTypeParameterStub(parent: KotlinStubBaseImpl<*>, type: Type, name: Name, annotations: List<ClassIdWithTarget>) {
+    private fun createTypeParameterStub(parent: KotlinStubBaseImpl<*>, type: Type, name: Name, annotations: List<AnnotationInfoWithTarget>) {
         createTypeAnnotationStubs(parent, type, annotations)
         createStubForTypeName(ClassId.topLevel(FqName.topLevel(name)), nullableTypeParent(parent, type))
     }
 
-    private fun createClassReferenceTypeStub(parent: KotlinStubBaseImpl<*>, type: Type, annotations: List<ClassIdWithTarget>) {
+    private fun createClassReferenceTypeStub(parent: KotlinStubBaseImpl<*>, type: Type, annotations: List<AnnotationInfoWithTarget>) {
         if (type.hasFlexibleTypeCapabilitiesId()) {
             val id = c.nameResolver.getString(type.flexibleTypeCapabilitiesId)
 
@@ -93,7 +93,7 @@ class TypeClsStubBuilder(private val c: ClsStubBuilderContext) {
                                         && type.argumentList.none { it.projection == Projection.STAR }
         if (shouldBuildAsFunctionType) {
             val (extensionAnnotations, notExtensionAnnotations) =
-                    annotations.partition { it.classId.asSingleFqName() == KotlinBuiltIns.FQ_NAMES.extensionFunctionType }
+                    annotations.partition { it.info.classId.asSingleFqName() == KotlinBuiltIns.FQ_NAMES.extensionFunctionType }
 
             val isExtension = extensionAnnotations.isNotEmpty()
             val isSuspend = Flags.SUSPEND_TYPE.get(type.flags)
@@ -123,7 +123,7 @@ class TypeClsStubBuilder(private val c: ClsStubBuilderContext) {
         }
     }
 
-    private fun createTypeAnnotationStubs(parent: KotlinStubBaseImpl<*>, type: Type, annotations: List<ClassIdWithTarget>) {
+    private fun createTypeAnnotationStubs(parent: KotlinStubBaseImpl<*>, type: Type, annotations: List<AnnotationInfoWithTarget>) {
         val typeModifiers = getTypeModifiersAsWritten(type)
         if (annotations.isEmpty() && typeModifiers.isEmpty()) return
         val typeModifiersMask = ModifierMaskUtils.computeMask { it in typeModifiers }

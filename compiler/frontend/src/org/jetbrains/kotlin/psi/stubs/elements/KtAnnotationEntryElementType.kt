@@ -16,6 +16,7 @@
 
 package org.jetbrains.kotlin.psi.stubs.elements
 
+import com.intellij.openapi.project.Project
 import com.intellij.psi.stubs.IndexSink
 import com.intellij.psi.stubs.StubElement
 import com.intellij.psi.stubs.StubInputStream
@@ -62,24 +63,7 @@ class KtAnnotationEntryElementType(
         val referencedName = (calleeExpression?.typeReference?.typeElement as? KtUserType)?.referencedName ?: return null
         if (referencedName != "ReplacementFor") return null //TODO: import aliases
         val firstArgument = extractExpressionFromReplacementForAnnotation(this) as? KtStringTemplateExpression ?: return null
-        val expression = try {
-            //TODO: escape entries
-            KtPsiFactory(project).createExpression(firstArgument.plainContent)
-        }
-        catch (t: Throwable) {
-            return null
-        }
-        //TODO: we should highlight patterns that are currently not supported
-        return expression.callNameExpression()?.getReferencedName()
-    }
-
-    private fun KtExpression.callNameExpression(): KtNameReferenceExpression? {
-        return when(this) {
-            is KtNameReferenceExpression -> this
-            is KtCallExpression -> calleeExpression as? KtNameReferenceExpression
-            is KtQualifiedExpression -> selectorExpression?.callNameExpression()
-            else -> null
-        }
+        return replacementForPatternName(firstArgument.plainContent, project)
     }
 }
 
@@ -91,4 +75,25 @@ fun extractExpressionFromReplacementForAnnotation(entry: KtAnnotationEntry): KtE
     else
         arguments.firstOrNull { it.getArgumentName()?.asName?.asString() == "expression" }
     return argument?.getArgumentExpression()
+}
+
+fun replacementForPatternName(pattern: String, project: Project): String? {
+    val expression = try {
+        //TODO: escape entries
+        KtPsiFactory(project).createExpression(pattern)
+    }
+    catch (t: Throwable) {
+        return null
+    }
+    //TODO: we should highlight patterns that are currently not supported
+    return expression.callNameExpression()?.getReferencedName()
+}
+
+private fun KtExpression.callNameExpression(): KtNameReferenceExpression? {
+    return when(this) {
+        is KtNameReferenceExpression -> this
+        is KtCallExpression -> calleeExpression as? KtNameReferenceExpression
+        is KtQualifiedExpression -> selectorExpression?.callNameExpression()
+        else -> null
+    }
 }

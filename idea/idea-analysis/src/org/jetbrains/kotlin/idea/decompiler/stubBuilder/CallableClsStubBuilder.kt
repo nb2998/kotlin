@@ -105,7 +105,7 @@ abstract class CallableClsStubBuilder(
     }
 
     abstract val receiverType: ProtoBuf.Type?
-    abstract val receiverAnnotations: List<ClassIdWithTarget>
+    abstract val receiverAnnotations: List<AnnotationInfoWithTarget>
 
     abstract val returnType: ProtoBuf.Type?
 
@@ -137,11 +137,11 @@ private class FunctionClsStubBuilder(
     override val receiverType: ProtoBuf.Type?
         get() = functionProto.receiverType(c.typeTable)
 
-    override val receiverAnnotations: List<ClassIdWithTarget>
+    override val receiverAnnotations: List<AnnotationInfoWithTarget>
         get() {
             return c.components.annotationLoader
                     .loadExtensionReceiverParameterAnnotations(protoContainer, functionProto, AnnotatedCallableKind.FUNCTION)
-                    .map { ClassIdWithTarget(it, AnnotationUseSiteTarget.RECEIVER) }
+                    .map { AnnotationInfoWithTarget(it, AnnotationUseSiteTarget.RECEIVER) }
         }
 
     override val returnType: ProtoBuf.Type?
@@ -191,11 +191,11 @@ private class PropertyClsStubBuilder(
     override val receiverType: ProtoBuf.Type?
         get() = propertyProto.receiverType(c.typeTable)
 
-    override val receiverAnnotations: List<ClassIdWithTarget>
+    override val receiverAnnotations: List<AnnotationInfoWithTarget>
         get() {
             return c.components.annotationLoader
                     .loadExtensionReceiverParameterAnnotations(protoContainer, propertyProto, AnnotatedCallableKind.PROPERTY_GETTER)
-                    .map { ClassIdWithTarget(it, AnnotationUseSiteTarget.RECEIVER) }
+                    .map { AnnotationInfoWithTarget(it, AnnotationUseSiteTarget.RECEIVER) }
         }
 
     override val returnType: ProtoBuf.Type?
@@ -246,7 +246,7 @@ private class ConstructorClsStubBuilder(
     override val receiverType: ProtoBuf.Type?
         get() = null
 
-    override val receiverAnnotations: List<ClassIdWithTarget>
+    override val receiverAnnotations: List<AnnotationInfoWithTarget>
         get() = emptyList()
 
     override val returnType: ProtoBuf.Type?

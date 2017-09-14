@@ -50,7 +50,7 @@ abstract class AbstractReplacementForTest : KotlinLightCodeInsightFixtureTestCas
                 error("Errors found in source file:\n${psiFile.dumpTextWithErrors()}")
             }
 
-            val patternMatcher = AllPatternMatcher(project, resolutionFacade)
+            val patternMatcher = AllPatternMatcher(psiFile)
 
             project.executeWriteCommand("") {
                 val replacements = ArrayList<Pair<KtExpression, ReplacementForPatternMatch>>()
