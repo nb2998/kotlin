@@ -31,6 +31,7 @@ import org.jetbrains.kotlin.psi.*
 import org.jetbrains.kotlin.psi.psiUtil.isAncestor
 import org.jetbrains.kotlin.renderer.render
 import org.jetbrains.kotlin.resolve.BindingContext
+import org.jetbrains.kotlin.resolve.calls.callUtil.getResolvedCall
 import org.jetbrains.kotlin.resolve.descriptorUtil.isExtension
 import org.jetbrains.kotlin.resolve.scopes.ExplicitImportsScope
 import org.jetbrains.kotlin.resolve.scopes.utils.addImportingScope
@@ -69,8 +70,14 @@ fun ReplacementForPatternMatch.checkCorrectness(expressionToReplace: KtExpressio
 
     val newBindingContext = newExpression.analyzeAsReplacement(expressionToReplace, bindingContext, resolutionScope)
     //TODO: why doesn't it work without "noSuppression()"?
-    //TODO: also check that call is resolved to the right callable?
-    return newBindingContext.diagnostics.noSuppression().none { it.severity == Severity.ERROR && newExpression.isAncestor(it.psiElement) }
+    if (newBindingContext.diagnostics.noSuppression().any { it.severity == Severity.ERROR && newExpression.isAncestor(it.psiElement) }) {
+        return false
+    }
+
+    val resolvedCall = newExpression.getResolvedCall(newBindingContext) ?: return false
+    if (resolvedCall.resultingDescriptor.original != callable) return false
+    
+    return true
 }
 
 private data class Replacement(
@@ -80,6 +87,10 @@ private data class Replacement(
 )
 
 private fun buildReplacement(match: ReplacementForPatternMatch, expressionToBeReplaced: KtExpression): Replacement {
+    for (value in match.arguments.values) {
+        assert(value.isValid)
+    }
+
     val callable = match.callable
     val receiverEntry = match.arguments.entries.firstOrNull { it.key is ReceiverParameterDescriptor }
     val receiverValue = receiverEntry?.value

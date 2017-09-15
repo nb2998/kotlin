@@ -1,0 +1,10 @@
+// WITH_RUNTIME
+fun foo(o: Any) {
+    //TODO
+    //System.out.print("a")
+
+    print(1)
+    println()
+    println(o)
+    println(1.0)
+}

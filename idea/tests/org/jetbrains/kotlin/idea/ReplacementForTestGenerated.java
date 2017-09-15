@@ -133,5 +133,11 @@ public class ReplacementForTestGenerated extends AbstractReplacementForTest {
             String fileName = KotlinTestUtils.navigationMetadata("idea/testData/replacementFor/stdlib/CreateTempFile.kt");
             doTest(fileName);
         }
+
+        @TestMetadata("SystemOutPrint.kt")
+        public void testSystemOutPrint() throws Exception {
+            String fileName = KotlinTestUtils.navigationMetadata("idea/testData/replacementFor/stdlib/SystemOutPrint.kt");
+            doTest(fileName);
+        }
     }
 }

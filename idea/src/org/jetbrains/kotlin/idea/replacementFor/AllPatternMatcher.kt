@@ -60,22 +60,24 @@ class AllPatternMatcher(private val file: KtFile) {
     fun match(expression: KtExpression, bindingContext: BindingContext): Collection<ReplacementForPatternMatch> {
         val name = expression.callNameExpression()?.getReferencedName() ?: return emptyList()
         val functionDeclarations = ReplacementForAnnotationIndex.getInstance().get(name, file.project, searchScope)
-        val result = SmartList<ReplacementForPatternMatch>()
-        for (declaration in functionDeclarations) {
-            if (declaration.isAncestor(expression)) continue // do not replace inside the function which is annotated by this @ReplacementFor
 
-            // TODO: TEMP hack!
-            val descriptors = with(indicesHelper) { declaration.resolveToDescriptorsWithHack<FunctionDescriptor>() }
-            for (descriptor in descriptors) {
-                val patterns = extractReplacementForPatterns(descriptor)
-                for (pattern in patterns) {
-                    val matcher = matchers.getOrPutNullable(MatcherKey(descriptor, pattern)) {
-                        val resolvablePattern = pattern.analyzeAsExpression(descriptor, resolutionFacade)
-                                                ?: return@getOrPutNullable null
-                        PatternMatcher(descriptor, resolvablePattern.expression, resolvablePattern.analyze)
-                    } ?: continue
-                    result.addIfNotNull(matcher.matchExpression(expression, bindingContext, pattern))
-                }
+        val functionDescriptors = with (indicesHelper) {
+            functionDeclarations
+                    .filterNot { it.isAncestor(expression) } // do not replace inside the function which is annotated by this @ReplacementFor
+                    .flatMap { it.resolveToDescriptorsWithHack<FunctionDescriptor>() } // TODO: TEMP hack!
+                    .distinct()
+        }
+
+        val result = SmartList<ReplacementForPatternMatch>()
+        for (descriptor in functionDescriptors) {
+            val patterns = extractReplacementForPatterns(descriptor)
+            for (pattern in patterns) {
+                val matcher = matchers.getOrPutNullable(MatcherKey(descriptor, pattern)) {
+                    val resolvablePattern = pattern.analyzeAsExpression(descriptor, resolutionFacade)
+                                            ?: return@getOrPutNullable null
+                    PatternMatcher(descriptor, resolvablePattern.expression, resolvablePattern.analyze)
+                } ?: continue
+                result.addIfNotNull(matcher.matchExpression(expression, bindingContext, pattern))
             }
         }
         return result

@@ -55,9 +55,11 @@ abstract class AbstractReplacementForTest : KotlinLightCodeInsightFixtureTestCas
             project.executeWriteCommand("") {
                 val replacements = ArrayList<Pair<KtExpression, ReplacementForPatternMatch>>()
                 psiFile.forEachDescendantOfType<KtExpression> { expression ->
-                    patternMatcher
-                            .match(expression, bindingContext)
-                            .forEach { replacements.add(expression to it) }
+                    val matches = patternMatcher.match(expression, bindingContext)
+                    if (matches.size > 1) {
+                        error("Multiple replacements available for ${expression.text}")
+                    }
+                    matches.singleOrNull()?.let { replacements.add(expression to it) }
                 }
 
                 for ((expression, match) in replacements) {
