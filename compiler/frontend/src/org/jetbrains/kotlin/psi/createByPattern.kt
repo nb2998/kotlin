@@ -52,6 +52,7 @@ private abstract class PsiElementPlaceholderArgumentType<T : Any, TPlaceholder :
 
 private class PsiElementArgumentType<T : PsiElement>(klass: Class<T>) : PsiElementPlaceholderArgumentType<T, T>(klass, klass) {
     override fun replacePlaceholderElement(placeholder: T, argument: T): PsiChildRange {
+        assert(argument.isValid) { "Invalid PsiElement as argument" }
         // if argument element has generated flag then it has not been formatted yet and we should do this manually
         // (because we cleared this flag for the whole tree above and PostprocessReformattingAspect won't format anything)
         val reformat = CodeEditUtil.isNodeGenerated(argument.node)
@@ -284,6 +285,7 @@ class BuilderByPattern<TElement> {
 
     fun appendExpression(expression: KtExpression?): BuilderByPattern<TElement> {
         if (expression != null) {
+            assert(expression.isValid) { "Invalid expression" }
             patternBuilder.append("$" + arguments.size)
             arguments.add(expression)
         }
@@ -302,6 +304,7 @@ class BuilderByPattern<TElement> {
 
     fun appendTypeReference(typeRef: KtTypeReference?): BuilderByPattern<TElement> {
         if (typeRef != null) {
+            assert(typeRef.isValid) { "Invalid type reference" }
             patternBuilder.append("$" + arguments.size)
             arguments.add(typeRef)
         }
