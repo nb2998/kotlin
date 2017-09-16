@@ -130,15 +130,16 @@ fun Project.publish(body: Upload.() -> Unit = {}): Upload {
 }
 
 fun Project.ideaPlugin(subdir: String = "lib", body: AbstractCopyTask.() -> Unit): Copy {
+    val thisProject = this
     val pluginTask = task<Copy>("ideaPlugin") {
         body()
         into(File(rootProject.extra["ideaPluginDir"].toString(), subdir).path)
-        rename("-${java.util.regex.Pattern.quote(rootProject.extra["build.number"].toString())}", "")
+        rename("-${java.util.regex.Pattern.quote(thisProject.version.toString())}", "")
     }
 
     task("idea-plugin") {
         dependsOn(pluginTask)
-    }
+}
 
     return pluginTask
 }
@@ -163,7 +164,7 @@ fun Project.dist(targetDir: File? = null,
             from(it)
             if (targetName != null) {
                 rename(it.outputs.files.singleFile.name, targetName)
-            }
+        }
         }
         rename("-${java.util.regex.Pattern.quote(rootProject.extra["build.number"].toString())}", "")
         into(targetDir ?: distLibDir)
@@ -185,7 +186,7 @@ fun Jar.setupPublicJar(classifier: String = "", classifierDescr: String? = null)
         put("Built-By", project.rootProject.extra["manifest.impl.vendor"])
         put("Implementation-Vendor", project.rootProject.extra["manifest.impl.vendor"])
         put("Implementation-Title", "${project.description} ${classifierDescr ?: classifier}".trim())
-        put("Implementation-Version", project.rootProject.extra["build.number"])
+        put("Implementation-Version", project.rootProject.extra["buildNumber"])
     }
 //    from(project.configurations.getByName("build-version").files, action = { into("META-INF/") })
 }
