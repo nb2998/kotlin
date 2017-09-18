@@ -96,6 +96,12 @@ public class ReplacementForTestGenerated extends AbstractReplacementForTest {
         doTest(fileName);
     }
 
+    @TestMetadata("OptionalParams.kt")
+    public void testOptionalParams() throws Exception {
+        String fileName = KotlinTestUtils.navigationMetadata("idea/testData/replacementFor/OptionalParams.kt");
+        doTest(fileName);
+    }
+
     @TestMetadata("OtherFunction.kt")
     public void testOtherFunction() throws Exception {
         String fileName = KotlinTestUtils.navigationMetadata("idea/testData/replacementFor/OtherFunction.kt");

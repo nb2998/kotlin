@@ -32,6 +32,7 @@ import org.jetbrains.kotlin.psi.psiUtil.isAncestor
 import org.jetbrains.kotlin.renderer.render
 import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.calls.callUtil.getResolvedCall
+import org.jetbrains.kotlin.resolve.descriptorUtil.hasDefaultValue
 import org.jetbrains.kotlin.resolve.descriptorUtil.isExtension
 import org.jetbrains.kotlin.resolve.scopes.ExplicitImportsScope
 import org.jetbrains.kotlin.resolve.scopes.utils.addImportingScope
@@ -61,6 +62,8 @@ fun ReplacementForPatternMatch.replaceExpression(expression: KtExpression): KtEx
 }
 
 fun ReplacementForPatternMatch.checkCorrectness(expressionToReplace: KtExpression, bindingContext: BindingContext): Boolean {
+    if (callable.valueParameters.any { !arguments.containsKey(it) && !it.hasDefaultValue() }) return false // value for some parameter missing in the match
+
     val (newExpression, addImport, _) = buildReplacement(this, expressionToReplace)
 
     var resolutionScope = expressionToReplace.getResolutionScope(bindingContext)!!
@@ -117,11 +120,25 @@ private fun buildReplacement(match: ReplacementForPatternMatch, expressionToBeRe
 
         appendFixedText("(")
 
-        for ((index, parameter) in callable.valueParameters.withIndex()) {
-            if (index > 0) {
+        var useNamedArguments = false
+        var count = 0
+        for (parameter in callable.valueParameters) {
+            val value = match.arguments[parameter]
+            if (value == null) {
+                assert(parameter.hasDefaultValue())
+                useNamedArguments = true
+                continue
+            }
+
+            if (count++ > 0) {
                 appendFixedText(",")
             }
-            val value = match.arguments[parameter] ?: error("No value for parameter") //TODO
+
+            if (useNamedArguments) {
+                appendName(parameter.name)
+                appendFixedText("=")
+            }
+
             appendExpression(value)
         }
 

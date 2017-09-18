@@ -39,7 +39,6 @@ data class ReplacementForPatternMatch(
         val arguments: Map<ParameterDescriptor, KtExpression>
 )
 
-//TODO: where to check that pattern has all parameters of the callable included?
 class PatternMatcher(
         private val callable: FunctionDescriptor,
         private val pattern: KtExpression,
