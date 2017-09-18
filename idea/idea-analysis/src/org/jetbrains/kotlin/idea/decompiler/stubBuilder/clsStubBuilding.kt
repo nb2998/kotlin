@@ -219,7 +219,7 @@ fun createTargetedAnnotationStubs(
                 parent,
                 shortName = info.classId.shortClassName.asString(),
                 hasValueArguments = false, // arguments are not really supported yet
-                replacementForPatternName = replacementForPatternName(info, parent.project)
+                replacementForPatternNames = replacementForPatternNames(info, parent.project)
         )
         if (target != null) {
             KotlinAnnotationUseSiteTargetStubImpl(annotationEntryStubImpl, StringRef.fromString(target.name)!!)
@@ -230,10 +230,10 @@ fun createTargetedAnnotationStubs(
     }
 }
 
-private fun replacementForPatternName(annotationInfo: AnnotationInfo, project: Project): String? {
-    if (annotationInfo.classId.asSingleFqName().asString() != "kotlin.ReplacementFor") return null
-    val pattern = annotationInfo.arguments[Name.identifier("expression")] as? String ?: return null
-    return replacementForPatternName(pattern, project)
+private fun replacementForPatternNames(annotationInfo: AnnotationInfo, project: Project): Collection<String> {
+    if (annotationInfo.classId.asSingleFqName().asString() != "kotlin.ReplacementFor") return emptyList()
+    val patterns = annotationInfo.arguments[Name.identifier("expressions")] as? Array<Any> ?: return emptyList()
+    return patterns.mapNotNull { replacementForPatternName(it as String, project) }
 }
 
 val MessageLite.annotatedCallableKind: AnnotatedCallableKind

@@ -1,4 +1,4 @@
 package new
 
-@ReplacementFor("s.doIt()", "old.doIt")
+@ReplacementFor("s.doIt()", imports = arrayOf("old.doIt"))
 fun doIt(s: String){}

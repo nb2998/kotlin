@@ -21,7 +21,9 @@ import com.intellij.psi.stubs.IndexSink
 import com.intellij.psi.stubs.StubElement
 import com.intellij.psi.stubs.StubInputStream
 import com.intellij.psi.stubs.StubOutputStream
+import com.intellij.util.io.StringRef
 import org.jetbrains.annotations.NonNls
+import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi.*
 import org.jetbrains.kotlin.psi.psiUtil.plainContent
 import org.jetbrains.kotlin.psi.stubs.KotlinAnnotationEntryStub
@@ -36,45 +38,52 @@ class KtAnnotationEntryElementType(
         val resultName = shortName?.asString() ?: psi.text
         val valueArgumentList = psi.valueArgumentList
         val hasValueArguments = valueArgumentList != null && !valueArgumentList.arguments.isEmpty()
-        val patternName = psi.replacementForPatternName()
-        return KotlinAnnotationEntryStubImpl(parentStub, resultName, hasValueArguments, patternName)
+        val patternNames = psi.replacementForPatternNames()
+        return KotlinAnnotationEntryStubImpl(parentStub, resultName, hasValueArguments, patternNames)
     }
 
     override fun serialize(stub: KotlinAnnotationEntryStub, dataStream: StubOutputStream) {
         dataStream.writeName(stub.shortName)
         dataStream.writeBoolean(stub.hasValueArguments)
-        dataStream.writeName(stub.replacementForPatternName)
+
+        dataStream.writeVarInt(stub.replacementForPatternNames.size)
+        stub.replacementForPatternNames.forEach { dataStream.writeName(it) }
     }
 
     override fun deserialize(dataStream: StubInputStream, parentStub: StubElement<*>): KotlinAnnotationEntryStub {
-        return KotlinAnnotationEntryStubImpl(
-                parentStub,
-                dataStream.readName()!!.string,
-                dataStream.readBoolean(),
-                dataStream.readName()?.string
-        )
+        val shortName = dataStream.readName()!!.string
+        val hasValueArguments = dataStream.readBoolean()
+        val count = dataStream.readVarInt()
+        val patternNames = if (count > 0) {
+            ArrayList<String>(count).apply {
+                repeat(count) { add(dataStream.readName()!!.string) }
+            }
+        }
+        else {
+            emptyList<String>()
+        }
+        return KotlinAnnotationEntryStubImpl(parentStub, shortName, hasValueArguments, patternNames)
     }
 
     override fun indexStub(stub: KotlinAnnotationEntryStub, sink: IndexSink) {
         StubIndexService.getInstance().indexAnnotation(stub, sink)
     }
 
-    private fun KtAnnotationEntry.replacementForPatternName(): String? {
-        val referencedName = (calleeExpression?.typeReference?.typeElement as? KtUserType)?.referencedName ?: return null
-        if (referencedName != "ReplacementFor") return null //TODO: import aliases
-        val firstArgument = extractExpressionFromReplacementForAnnotation(this) as? KtStringTemplateExpression ?: return null
-        return replacementForPatternName(firstArgument.plainContent, project)
+    private fun KtAnnotationEntry.replacementForPatternNames(): Collection<String> {
+        val referencedName = (calleeExpression?.typeReference?.typeElement as? KtUserType)?.referencedName ?: return emptyList()
+        if (referencedName != "ReplacementFor") return emptyList() //TODO: import aliases
+        return extractExpressionsFromReplacementForAnnotation(this)
+                .mapNotNull { it as? KtStringTemplateExpression }
+                .mapNotNull { replacementForPatternName(it.plainContent, project) }
+                .distinct()
     }
 }
 
-fun extractExpressionFromReplacementForAnnotation(entry: KtAnnotationEntry): KtExpression? {
-    val arguments = entry.valueArguments
-    val first = arguments.firstOrNull() ?: return null
-    val argument = if (!first.isNamed())
-        first
-    else
-        arguments.firstOrNull { it.getArgumentName()?.asName?.asString() == "expression" }
-    return argument?.getArgumentExpression()
+fun extractExpressionsFromReplacementForAnnotation(entry: KtAnnotationEntry): Collection<KtExpression> {
+    //TODO: named argument and "*" argument
+    return entry.valueArguments
+            .takeWhile { !it.isNamed() }
+            .mapNotNull { it.getArgumentExpression() }
 }
 
 fun replacementForPatternName(pattern: String, project: Project): String? {

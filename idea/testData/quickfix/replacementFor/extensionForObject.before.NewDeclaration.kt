@@ -2,5 +2,5 @@ package new
 
 object NewObject
 
-@ReplacementFor("s.doIt()", "old.doIt")
+@ReplacementFor("s.doIt()", imports = arrayOf("old.doIt"))
 fun NewObject.doIt(s: String){}

@@ -96,12 +96,6 @@ public class ReplacementForTestGenerated extends AbstractReplacementForTest {
         doTest(fileName);
     }
 
-    @TestMetadata("NamedAnnotationArgs.kt")
-    public void testNamedAnnotationArgs() throws Exception {
-        String fileName = KotlinTestUtils.navigationMetadata("idea/testData/replacementFor/NamedAnnotationArgs.kt");
-        doTest(fileName);
-    }
-
     @TestMetadata("OtherFunction.kt")
     public void testOtherFunction() throws Exception {
         String fileName = KotlinTestUtils.navigationMetadata("idea/testData/replacementFor/OtherFunction.kt");

@@ -41,8 +41,7 @@ public fun createTempDir(prefix: String = "tmp", suffix: String? = null, directo
  * @throws IOException in case of input/output error.
  * @throws IllegalArgumentException if [prefix] is shorter than three symbols.
  */
-@ReplacementFor("java.io.File.createTempFile(prefix, suffix, directory)")
-//TODO: also replacement for java.io.File.createTempFile(prefix, suffix)
+@ReplacementFor("java.io.File.createTempFile(prefix, suffix, directory)", "java.io.File.createTempFile(prefix, suffix)")
 public fun createTempFile(prefix: String = "tmp", suffix: String? = null, directory: File? = null): File {
     return File.createTempFile(prefix, suffix, directory)
 }

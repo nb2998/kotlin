@@ -86,17 +86,20 @@ class AllPatternMatcher(private val file: KtFile) {
     private fun extractReplacementForPatterns(descriptor: CallableDescriptor): Collection<PatternAnnotationData> {
         val fqName = FqName("kotlin.ReplacementFor") //TODO
         return descriptor.annotations
-                .filter { it.fqName == fqName }
-                .mapNotNull { it.extractData() }
+                .firstOrNull { it.fqName == fqName }
+                ?.extractData() ?: emptyList()
 
     }
 
-    private fun AnnotationDescriptor.extractData(): PatternAnnotationData? {
-        val pattern = argumentValue(kotlin.ReplaceWith::expression.name) as? String ?: return null //TODO
-        if (pattern.isEmpty()) return null
-        val importValues = argumentValue(kotlin.ReplaceWith::imports.name) as? List<*> ?: return null //TODO
-        if (importValues.any { it !is StringValue }) return null
+    private fun AnnotationDescriptor.extractData(): Collection<PatternAnnotationData> {
+        val patternValues = argumentValue("expressions") as? List<*> ?: return emptyList() //TODO
+        if (patternValues.any { it !is StringValue }) return emptyList()
+        val patterns = patternValues.map { (it as StringValue).value }
+
+        val importValues = argumentValue("imports") as? List<*> ?: emptyList<StringValue>() //TODO
+        if (importValues.any { it !is StringValue }) return emptyList()
         val imports = importValues.map { (it as StringValue).value }
-        return PatternAnnotationData(pattern, imports)
+
+        return patterns.map { PatternAnnotationData(it, imports) }
     }
 }

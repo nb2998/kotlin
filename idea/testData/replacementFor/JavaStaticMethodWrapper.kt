@@ -1,7 +1,7 @@
 // WITH_RUNTIME
 import javax.swing.SwingUtilities
 
-@ReplacementFor("SwingUtilities.invokeLater(this)", "javax.swing.SwingUtilities")
+@ReplacementFor("SwingUtilities.invokeLater(this)", imports = arrayOf("javax.swing.SwingUtilities"))
 fun Runnable.invokeItLater() {
     SwingUtilities.invokeLater(this)
 }

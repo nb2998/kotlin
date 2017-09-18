@@ -110,7 +110,9 @@ private val KotlinStubWithFqName<*>.modifierList: KotlinModifierListStub?
     get() = findChildStubByType(KtStubElementTypes.MODIFIER_LIST) as? KotlinModifierListStub
 
 internal fun KtNamedFunction.extractReplacementForPatternNames(): Collection<String> {
-    return annotationEntries
-            .mapNotNull { it.stub!!.replacementForPatternName }
-            .distinct()
+    for (entry in annotationEntries) {
+        val patternNames = entry.stub!!.replacementForPatternNames
+        if (patternNames.isNotEmpty()) return patternNames
+    }
+    return emptyList()
 }

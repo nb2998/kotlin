@@ -55,10 +55,10 @@ public annotation class ReplaceWith(val expression: String, vararg val imports: 
 /**
  * TODO
  */
-@Target(FUNCTION) //TODO: what else?
+@Target(FUNCTION)
 @Retention(BINARY)
 @MustBeDocumented
-public annotation class ReplacementFor(val expression: String, vararg val imports: String)
+public annotation class ReplacementFor(vararg val expressions: String, val imports: Array<String> = arrayOf())
 
 /**
  * Contains levels for deprecation levels.

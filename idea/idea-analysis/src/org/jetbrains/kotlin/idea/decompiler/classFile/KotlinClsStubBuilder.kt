@@ -26,6 +26,7 @@ import org.jetbrains.kotlin.descriptors.SourceElement
 import org.jetbrains.kotlin.descriptors.annotations.AnnotationUseSiteTarget
 import org.jetbrains.kotlin.idea.caches.IDEKotlinBinaryClassCache
 import org.jetbrains.kotlin.idea.decompiler.stubBuilder.*
+import org.jetbrains.kotlin.load.java.components.DescriptorResolverUtils
 import org.jetbrains.kotlin.load.kotlin.*
 import org.jetbrains.kotlin.load.kotlin.header.KotlinClassHeader
 import org.jetbrains.kotlin.name.ClassId
@@ -33,11 +34,13 @@ import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.stubs.KotlinStubVersions
+import org.jetbrains.kotlin.resolve.constants.ConstantValue
 import org.jetbrains.kotlin.serialization.ProtoBuf
 import org.jetbrains.kotlin.serialization.deserialization.NameResolver
 import org.jetbrains.kotlin.serialization.deserialization.TypeTable
 import org.jetbrains.kotlin.serialization.jvm.JvmProtoBufUtil
 import org.jetbrains.kotlin.storage.LockBasedStorageManager
+import org.jetbrains.kotlin.utils.compact
 import java.util.*
 
 open class KotlinClsStubBuilder : ClsStubBuilder() {
@@ -143,7 +146,21 @@ class AnnotationLoaderForClassFileStubBuilder(
             }
 
             override fun visitArray(name: Name): KotlinJvmBinaryClass.AnnotationArrayArgumentVisitor? {
-                return null //TODO: not supported currently
+                return object : KotlinJvmBinaryClass.AnnotationArrayArgumentVisitor {
+                    private val elements = ArrayList<Any?>()
+
+                    override fun visit(value: Any?) {
+                        elements.add(value)
+                    }
+
+                    override fun visitEnum(enumClassId: ClassId, enumEntryName: Name) {
+                        //TODO: not supported currently
+                    }
+
+                    override fun visitEnd() {
+                        arguments[name] = elements.toArray()
+                    }
+                }
             }
 
             override fun visitAnnotation(name: Name, classId: ClassId): KotlinJvmBinaryClass.AnnotationArgumentVisitor? {

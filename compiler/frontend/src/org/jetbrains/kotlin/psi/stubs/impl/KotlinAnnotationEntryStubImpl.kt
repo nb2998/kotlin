@@ -26,5 +26,5 @@ class KotlinAnnotationEntryStubImpl(
         parent: StubElement<out PsiElement>?,
         override val shortName: String,
         override val hasValueArguments: Boolean,
-        override val replacementForPatternName: String?
+        override val replacementForPatternNames: Collection<String>
 ) : KotlinStubBaseImpl<KtAnnotationEntry>(parent, KtStubElementTypes.ANNOTATION_ENTRY), KotlinAnnotationEntryStub
