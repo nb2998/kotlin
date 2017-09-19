@@ -1,4 +1,5 @@
 // "Replace by 'invokeLater' call" "true"
+// WITH_LIBRARY_AND_RUNTIME: replacementFor/annotation
 import javax.swing.SwingUtilities
 
 @ReplacementFor("SwingUtilities.invokeLater(this)", imports = arrayOf("javax.swing.SwingUtilities"))

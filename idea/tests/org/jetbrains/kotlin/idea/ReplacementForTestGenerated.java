@@ -33,7 +33,7 @@ import java.util.regex.Pattern;
 @RunWith(JUnit3RunnerWithInners.class)
 public class ReplacementForTestGenerated extends AbstractReplacementForTest {
     public void testAllFilesPresentInReplacementFor() throws Exception {
-        KotlinTestUtils.assertAllTestsPresentByMetadata(this.getClass(), new File("idea/testData/replacementFor"), Pattern.compile("^(.+)\\.kt$"), TargetBackend.ANY, true);
+        KotlinTestUtils.assertAllTestsPresentByMetadata(this.getClass(), new File("idea/testData/replacementFor"), Pattern.compile("^(.+)\\.kt$"), TargetBackend.ANY, true, "annotation");
     }
 
     @TestMetadata("CheckMatchedArgumentTypes.kt")

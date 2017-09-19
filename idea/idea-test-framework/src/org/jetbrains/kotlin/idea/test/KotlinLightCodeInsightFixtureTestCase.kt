@@ -116,6 +116,11 @@ abstract class KotlinLightCodeInsightFixtureTestCase : KotlinLightCodeInsightFix
                 if (!withLibraryDirective.isEmpty()) {
                     return JdkAndMockLibraryProjectDescriptor(PluginTestCaseBase.getTestDataPathBase() + "/" + withLibraryDirective.get(0), true)
                 }
+
+                val withLibraryAndRuntimeDirective = InTextDirectivesUtils.findLinesWithPrefixesRemoved(fileText, "WITH_LIBRARY_AND_RUNTIME:")
+                if (!withLibraryAndRuntimeDirective.isEmpty()) {
+                    return JdkAndMockLibraryProjectDescriptor(PluginTestCaseBase.getTestDataPathBase() + "/" + withLibraryAndRuntimeDirective.get(0), true, true, false, true)
+                }
                 else if (InTextDirectivesUtils.isDirectiveDefined(fileText, "RUNTIME_WITH_SOURCES")) {
                     return ProjectDescriptorWithStdlibSources.INSTANCE
                 }

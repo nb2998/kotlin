@@ -1108,7 +1108,7 @@ fun main(args: Array<String>) {
         }
 
         testClass<AbstractReplacementForTest> {
-            model("replacementFor")
+            model("replacementFor", excludeDirs = listOf("annotation"))
         }
     }
 

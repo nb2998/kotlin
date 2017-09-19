@@ -36,7 +36,8 @@ import java.io.File
 abstract class AbstractReplacementForTest : KotlinLightCodeInsightFixtureTestCase() {
     protected fun doTest(path: String) {
         val file = File(path)
-        val psiFile = myFixture.configureByFile(path) as KtFile
+        val annotationFilePath = file.parent + "/annotation/ReplacementFor.kt"
+        val psiFile = myFixture.configureByFiles(path, annotationFilePath)[0] as KtFile
 
         val fileText = FileUtil.loadFile(file, true)
         ConfigLibraryUtil.configureLibrariesByDirective(myModule, PlatformTestUtil.getCommunityPath(), fileText)

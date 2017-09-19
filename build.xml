@@ -465,6 +465,7 @@
                 source="${java.target}" target="${java.target}">
             <withKotlin modulename="kotlin-compiler">
                 <compilerarg value="-version"/>
+                <compilerarg value="-Xallow-kotlin-package"/>
             </withKotlin>
             <skip pattern="kotlin/Metadata"/>
             <src refid="compilerSources.path"/>

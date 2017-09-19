@@ -1,5 +1,5 @@
 // "Replace by 'doIt' call" "true"
-// WITH_RUNTIME
+// WITH_LIBRARY_AND_RUNTIME: replacementFor/annotation
 import new.doIt
 import old.doIt
 
