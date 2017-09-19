@@ -214,12 +214,13 @@ fun createTargetedAnnotationStubs(
 ) {
     if (annotationInfos.isEmpty()) return
 
+    val project = if (parent.psi.isValid) parent.project else null // no project in some tests
     annotationInfos.forEach { (info, target) ->
         val annotationEntryStubImpl = KotlinAnnotationEntryStubImpl(
                 parent,
                 shortName = info.classId.shortClassName.asString(),
                 hasValueArguments = false, // arguments are not really supported yet
-                replacementForPatternNames = replacementForPatternNames(info, parent.project)
+                replacementForPatternNames = if (project != null) replacementForPatternNames(info, project) else emptyList()
         )
         if (target != null) {
             KotlinAnnotationUseSiteTargetStubImpl(annotationEntryStubImpl, StringRef.fromString(target.name)!!)
