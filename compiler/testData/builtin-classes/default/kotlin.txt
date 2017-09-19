@@ -608,11 +608,11 @@ public abstract class Number {
 }
 
 @kotlin.annotation.Target(allowedTargets = {AnnotationTarget.FUNCTION}) @kotlin.annotation.Retention(value = AnnotationRetention.BINARY) @kotlin.annotation.MustBeDocumented public final annotation class ReplacementFor : kotlin.Annotation {
-    /*primary*/ public constructor ReplacementFor(/*0*/ expression: kotlin.String, /*1*/ vararg imports: kotlin.String /*kotlin.Array<out kotlin.String>*/)
-    public final val expression: kotlin.String
-        public final fun <get-expression>(): kotlin.String
-    public final val imports: kotlin.Array<out kotlin.String>
-        public final fun <get-imports>(): kotlin.Array<out kotlin.String>
+    /*primary*/ public constructor ReplacementFor(/*0*/ vararg expressions: kotlin.String /*kotlin.Array<out kotlin.String>*/, /*1*/ imports: kotlin.Array<kotlin.String> = ...)
+    public final val expressions: kotlin.Array<out kotlin.String>
+        public final fun <get-expressions>(): kotlin.Array<out kotlin.String>
+    public final val imports: kotlin.Array<kotlin.String>
+        public final fun <get-imports>(): kotlin.Array<kotlin.String>
 }
 
 public final class Short : kotlin.Number, kotlin.Comparable<kotlin.Short> {
