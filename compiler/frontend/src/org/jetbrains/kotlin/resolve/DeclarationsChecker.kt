@@ -30,6 +30,7 @@ import org.jetbrains.kotlin.diagnostics.Errors.*
 import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.psi.*
 import org.jetbrains.kotlin.psi.psiUtil.hasActualModifier
+import org.jetbrains.kotlin.psi.psiUtil.hasExpectModifier
 import org.jetbrains.kotlin.psi.psiUtil.visibilityModifier
 import org.jetbrains.kotlin.resolve.BindingContext.*
 import org.jetbrains.kotlin.resolve.DescriptorUtils.classCanHaveAbstractMembers
@@ -670,9 +671,14 @@ class DeclarationsChecker(
             else if (noExplicitTypeOrGetterType(property)) {
                 trace.report(PROPERTY_WITH_NO_TYPE_NO_INITIALIZER.on(property))
             }
-            if (backingFieldRequired && !inInterface && propertyDescriptor.isLateInit && !isUninitialized &&
-                trace[MUST_BE_LATEINIT, propertyDescriptor] != true) {
-                trace.report(UNNECESSARY_LATEINIT.on(property))
+
+            if (propertyDescriptor.isLateInit) {
+                if (propertyDescriptor.isExpect) {
+                    trace.report(EXPECTED_LATEINIT_PROPERTY.on(property.modifierList?.getModifier(KtTokens.LATEINIT_KEYWORD) ?: property))
+                }
+                if (backingFieldRequired && !inInterface && !isUninitialized && trace[MUST_BE_LATEINIT, propertyDescriptor] != true) {
+                    trace.report(UNNECESSARY_LATEINIT.on(property))
+                }
             }
         }
     }
